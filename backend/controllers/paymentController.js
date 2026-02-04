@@ -30,8 +30,8 @@ exports.savePayment = async (req, res) => {
     const payment = await Payment.create({
       invoiceId,
       memberId,
-      gateway: 'OFFLINE',   // ✅ FIXED
-      method: 'CASH',       // ✅ FIXED
+      gateway: 'OFFLINE',  
+      method: 'CASH',       
       amount,
       status: 'SUCCESS',
       transactionId: 'CASH-' + Date.now(),
@@ -43,122 +43,54 @@ exports.savePayment = async (req, res) => {
     console.error(err);
     res.status(500).json({ success: false, message: 'Payment save failed' });
   }
-};
-
-exports.verifyAndSavePayment = async (req, res) => {
+};exports.verifyAndSavePayment = async (req, res) => {
   try {
     const {
       razorpay_order_id,
       razorpay_payment_id,
       razorpay_signature,
       invoiceId,
+      memberId,
       amount,
-      method
+      method,
     } = req.body;
 
-    const body = razorpay_order_id + '|' + razorpay_payment_id;
+    const body = razorpay_order_id + "|" + razorpay_payment_id;
 
     const expectedSignature = crypto
-      .createHmac('sha256', process.env.PAY_SECRET)
+      .createHmac("sha256", process.env.PAY_SECRET)
       .update(body)
-      .digest('hex');
+      .digest("hex");
 
     if (expectedSignature !== razorpay_signature) {
-      return res.status(400).json({ success: false, message: 'Invalid signature' });
+      return res.status(400).json({
+        success: false,
+        message: "Invalid Razorpay signature",
+      });
     }
 
-  const payment = await Payment.create({
-  invoiceId,
-  memberId: req.body.memberId, // ✅ ADD THIS
-  gateway: 'RAZORPAY',
-  method,
-  amount,
-  status: 'SUCCESS',
-  transactionId: razorpay_payment_id,
-  paidAt: new Date()
-});
+    const payment = await Payment.create({
+      invoiceId,
+      memberId,
+      gateway: "RAZORPAY",
+      method, // UPI / CARD / NET_BANKING
+      amount,
+      status: "SUCCESS",
+      transactionId: razorpay_payment_id,
+      orderId: razorpay_order_id,
+      paidAt: new Date(),
+    });
 
-
-    res.json({ success: true, payment });
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Payment verification failed' });
-  }
-};
-
-exports.createPhonePePayment = async (req, res) => {
-  try {
-    const { invoiceId, amount, memberId } = req.body;
-
-    const merchantTransactionId = "MT" + Date.now();
-
-    const payload = {
-      merchantId: process.env.PHONEPE_MERCHANT_ID,
-      merchantTransactionId,
-      merchantUserId: memberId,
-      amount: amount * 100,
-      redirectUrl: process.env.PHONEPE_REDIRECT_URL,
-      redirectMode: "REDIRECT",
-      callbackUrl: process.env.PHONEPE_CALLBACK_URL,
-      paymentInstrument: { type: "PAY_PAGE" }
-    };
-
-    const base64Payload = Buffer.from(JSON.stringify(payload)).toString("base64");
-
-    const stringToSign =
-      base64Payload + "/pg/v1/pay" + process.env.PHONEPE_SALT_KEY;
-
-    const checksum =
-      crypto.createHash("sha256").update(stringToSign).digest("hex") +
-      "###" + process.env.PHONEPE_SALT_INDEX;
-
-    const response = await axios.post(
-      `${process.env.PHONEPE_BASE_URL}/pg/v1/pay`,
-      { request: base64Payload },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          "X-VERIFY": checksum
-        }
-      }
-    );
-console.log({
-  merchantId: process.env.PHONEPE_MERCHANT_ID,
-  saltKey: process.env.PHONEPE_SALT_KEY,
-  saltIndex: process.env.PHONEPE_SALT_INDEX
-});
-
-    res.json({
+    return res.json({
       success: true,
-      redirectUrl: response.data.data.instrumentResponse.redirectInfo.url,
-      merchantTransactionId
+      message: "Payment verified successfully",
+      payment,
     });
-  } catch (err) {
-    console.error(err.response?.data || err);
-    res.status(500).json({ success: false, message: "PhonePe init failed" });
-  }
-};
-
-exports.phonepeCallback = async (req, res) => {
-  try {
-    const { data, code } = req.body;
-
-    await Payment.create({
-      invoiceId: data.merchantTransactionId, // OR map from DB
-      memberId: data.merchantUserId,
-      gateway: "PHONEPE",
-      method: "UPI",
-      amount: data.amount / 100,
-      status: code === "PAYMENT_SUCCESS" ? "SUCCESS" : "FAILED",
-      transactionId: data.transactionId,
-      paidAt: new Date()
-    });
-
-    res.send("OK");
   } catch (err) {
     console.error(err);
-    res.status(500).send("Callback error");
+    return res.status(500).json({
+      success: false,
+      message: "Server error during payment verification",
+    });
   }
 };
-
-
-

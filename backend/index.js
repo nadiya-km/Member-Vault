@@ -1,16 +1,34 @@
 require('dotenv').config();
 
 const express = require('express');
+const cors = require('cors');
+
 const app = express();
 const connectDB = require('./config/db');
 
+
+app.use(
+  cors({
+    origin: 'http://localhost:5173',
+    credentials: true,
+  })
+);
+
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const port = process.env.PORT || 5000;
+// // app.get('/api/testing', (req, res) => {
+// // 	res.json({ status: 'ok', message: 'backend is connected' });
+// // });
 
-// app.get('/api/testing', (req, res) => {
-// 	res.json({ status: 'ok', message: 'backend is connected' });
-// });
+const paymentRoutes = require('./routes/payment');
+app.use('/api/payments', paymentRoutes);
+
+const authRoutes = require("./routes/auth");
+app.use("/api/auth", authRoutes);
+
+
+const port = process.env.PORT || 3000;
 
 app.listen(port, async () => {
 	await connectDB();

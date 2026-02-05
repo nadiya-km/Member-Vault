@@ -20,20 +20,24 @@ app.use(express.urlencoded({ extended: true }));
 // // 	res.json({ status: 'ok', message: 'backend is connected' });
 // // });
 
-const paymentRoutes = require('./routes/payment');
-app.use('/api/payments', paymentRoutes);
 
 const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
-
-const planRoutes = require('./routes/Plan');
-app.use('/api/membership-plan', planRoutes);
 
 const trainerRoutes = require('./routes/trainer');
 app.use('/api/trainers', trainerRoutes);
 
 const memberRoutes = require('./routes/member');
 app.use('/api/members', memberRoutes);
+
+const membershipRoutes = require('./routes/membership');
+app.use('/api', membershipRoutes);
+
+const membershipPlanRoutes = require('./routes/Plan');
+app.use('/api/membership-plans', membershipPlanRoutes);
+
+const paymentRoutes = require('./routes/payment');
+app.use('/api/payments', paymentRoutes);
 
 const port = process.env.PORT || 3000;
 

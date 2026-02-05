@@ -9,6 +9,8 @@ import ProtectedRoute from './ProtectedRoute';
 import Trainers from '../pages/admin/Trainers';
 import MembershipPlans from '../pages/admin/MembershipPlans';
 import Member from '../pages/admin/member/members';
+import MemberDetails from '../pages/admin/member/MemberDetails';
+import AddMembership from '../pages/admin/member/addMembership';
 
 const AppRoutes = () => {
 	const location = useLocation();
@@ -69,6 +71,25 @@ const AppRoutes = () => {
 						</ProtectedRoute>
 					}
 				/>
+
+				<Route
+					path="/admin/members/:id"
+					element={
+						<ProtectedRoute>
+							<MemberDetails />
+						</ProtectedRoute>
+					}
+				/>
+
+				<Route
+					path="/admin/members/:id/add-membership"
+					element={
+						<ProtectedRoute>
+							<AddMembership />
+						</ProtectedRoute>
+					}
+				/>
+
 				<Route
 					path="/payment/:invoiceId"
 					element={

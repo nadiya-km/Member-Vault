@@ -27,11 +27,6 @@ const memberSchema = new mongoose.Schema(
 		age: {
 			type: Number,
 		},
-		personalTrainer: {
-			type: mongoose.Schema.Types.ObjectId,
-			ref: 'PersonalTrainer',
-		},
-
 		status: {
 			type: String,
 			enum: ['active', 'inactive'],

@@ -1,50 +1,34 @@
-const MemberTable = ({ members = [] }) => {
+import { useNavigate } from 'react-router-dom';
+
+const MemberTable = ({ members }) => {
+	const navigate = useNavigate();
+
 	return (
-		<div className="bg-white rounded-xl shadow overflow-x-auto">
-			<table className="w-full text-sm">
-				<thead className="bg-gray-100 text-gray-700">
-					<tr>
-						<th className="px-4 py-3 text-left">Name</th>
-						<th className="px-4 py-3 text-left">Email</th>
-						<th className="px-4 py-3 text-left">Phone</th>
-						<th className="px-4 py-3 text-left">WhatsApp</th>
-						<th className="px-4 py-3 text-left">Age</th>
-						<th className="px-4 py-3 text-left">Status</th>
+		<table className="table">
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Email</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				{members.map((m) => (
+					<tr key={m._id}>
+						<td>{m.name}</td>
+						<td>{m.email}</td>
+						<td>
+							<button
+								className="btn btn-primary btn-sm"
+								onClick={() => navigate(`/admin/members/${m._id}`)}
+							>
+								Manage
+							</button>
+						</td>
 					</tr>
-				</thead>
-
-				<tbody>
-					{members.length === 0 && (
-						<tr>
-							<td colSpan="6" className="text-center py-6 text-gray-500">
-								No members found
-							</td>
-						</tr>
-					)}
-
-					{members.map((m) => (
-						<tr key={m._id} className="border-t hover:bg-gray-50 transition">
-							<td className="px-4 py-3 font-medium">{m.name}</td>
-							<td className="px-4 py-3">{m.email}</td>
-							<td className="px-4 py-3">{m.phone}</td>
-							<td className="px-4 py-3">{m.whatsappNumber}</td>
-							<td className="px-4 py-3">{m.age || '-'}</td>
-							<td className="px-4 py-3">
-								<span
-									className={`px-2 py-1 rounded-full text-xs font-medium ${
-										m.status === 'active'
-											? 'bg-green-100 text-green-700'
-											: 'bg-red-100 text-red-700'
-									}`}
-								>
-									{m.status}
-								</span>
-							</td>
-						</tr>
-					))}
-				</tbody>
-			</table>
-		</div>
+				))}
+			</tbody>
+		</table>
 	);
 };
 

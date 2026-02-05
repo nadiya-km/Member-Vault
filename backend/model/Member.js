@@ -1,3 +1,5 @@
+const crypto = require('crypto');
+
 const mongoose = require('mongoose');
 
 const memberSchema = new mongoose.Schema(
@@ -26,9 +28,10 @@ const memberSchema = new mongoose.Schema(
 			type: Number,
 		},
 		personalTrainer: {
-			name: String,
-			phone: String,
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'PersonalTrainer',
 		},
+
 		status: {
 			type: String,
 			enum: ['active', 'inactive'],
@@ -36,9 +39,9 @@ const memberSchema = new mongoose.Schema(
 		},
 		secretKey: {
 			type: String,
-			required: true,
 			index: true,
 			unique: true,
+			select: false,
 		},
 	},
 	{ timestamps: true }
@@ -48,7 +51,6 @@ memberSchema.pre('save', function (next) {
 	if (!this.secretKey) {
 		this.secretKey = crypto.randomBytes(32).toString('hex');
 	}
-	next();
 });
 //Admin secretKey regeneration method
 memberSchema.methods.regenerateSecretKey = function () {

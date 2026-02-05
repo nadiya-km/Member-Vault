@@ -6,7 +6,7 @@ const membershipPlanSchema = new mongoose.Schema(
 			type: String,
 			required: true,
 		},
-		durationInDays: {
+		durationInMonths: {
 			type: Number,
 			required: true,
 		},
@@ -14,6 +14,12 @@ const membershipPlanSchema = new mongoose.Schema(
 			type: Number,
 			required: true,
 		},
+		features: [
+			{
+				type: String,
+				trim: true,
+			},
+		],
 		isActive: {
 			type: Boolean,
 			default: true,

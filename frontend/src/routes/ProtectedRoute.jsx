@@ -3,9 +3,7 @@ import secureLocalStorage from "react-secure-storage";
 
 const ProtectedRoute = ({ children }) => {
   const token = secureLocalStorage.getItem("accessToken");
-  if (!token) {
-    return <Navigate to="/login" replace />;
-  }
-  return children;
+  return token ? children : <Navigate to="/login" replace />;
 };
+
 export default ProtectedRoute;

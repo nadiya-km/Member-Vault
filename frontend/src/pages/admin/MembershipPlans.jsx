@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { getPlans } from '../../services/planService';
 import PlanForm from '../../components/plans/PlanForm';
 import PlanTable from '../../components/plans/PlanTable';
+import AdminLayout from '../../components/layout/AdminLayout';
 
 const MembershipPlans = () => {
 	const [plans, setPlans] = useState([]);
@@ -24,29 +25,34 @@ const MembershipPlans = () => {
 	}, []);
 
 	return (
-		<div className="container mt-4">
-			<div className="d-flex justify-content-between align-items-center mb-3">
-				<h4>Membership Plans</h4>
-				<button className="btn btn-dark" onClick={() => setShowForm(!showForm)}>
-					{showForm ? 'Back to Plans' : '+ Add Plan'}
-				</button>
-			</div>
+		<AdminLayout>
+			<div className="p-4">
+				<div className="d-flex justify-content-between align-items-center mb-3">
+					<h4>Membership Plans</h4>
+					<button
+						className="btn btn-dark"
+						onClick={() => setShowForm(!showForm)}
+					>
+						{showForm ? 'Back to Plans' : '+ Add Plan'}
+					</button>
+				</div>
 
-			<div className="card p-3">
-				{showForm ? (
-					<PlanForm
-						onSuccess={() => {
-							setShowForm(false);
-							fetchPlans();
-						}}
-					/>
-				) : loading ? (
-					<p>Loading...</p>
-				) : (
-					<PlanTable plans={plans} onRefresh={fetchPlans} />
-				)}
+				<div className="card p-3">
+					{showForm ? (
+						<PlanForm
+							onSuccess={() => {
+								setShowForm(false);
+								fetchPlans();
+							}}
+						/>
+					) : loading ? (
+						<p>Loading...</p>
+					) : (
+						<PlanTable plans={plans} onRefresh={fetchPlans} />
+					)}
+				</div>
 			</div>
-		</div>
+		</AdminLayout>
 	);
 };
 

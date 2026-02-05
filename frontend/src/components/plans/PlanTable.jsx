@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { deletePlan, updatePlan } from '../../services/planService';
+import AdminLayout from '../../components/layout/AdminLayout';
 
 const PlanTable = ({ plans, onRefresh }) => {
 	const [selectedPlan, setSelectedPlan] = useState(null);

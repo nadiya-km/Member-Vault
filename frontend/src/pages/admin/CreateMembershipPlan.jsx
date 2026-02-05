@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import api from '../../services/api';
+import AdminLayout from '../../components/layout/AdminLayout';
 
 const CreateMembershipPlan = () => {
 	const [form, setForm] = useState({
@@ -27,62 +28,65 @@ const CreateMembershipPlan = () => {
 			});
 		} catch (err) {
 			alert('Failed to create plan');
-			console.log(err);
 		}
 	};
 
 	return (
-		<div className="card p-4">
-			<h4>Create Membership Plan</h4>
+		<AdminLayout>
+			<div className="p-4">
+				<div className="card p-4">
+					<h4>Create Membership Plan</h4>
 
-			<input
-				name="name"
-				placeholder="Plan Name"
-				value={form.name}
-				onChange={handleChange}
-				className="form-control mb-2"
-			/>
+					<input
+						name="name"
+						placeholder="Plan Name"
+						value={form.name}
+						onChange={handleChange}
+						className="form-control mb-2"
+					/>
 
-			<input
-				name="price"
-				type="number"
-				placeholder="Price"
-				value={form.price}
-				onChange={handleChange}
-				className="form-control mb-2"
-			/>
+					<input
+						name="price"
+						type="number"
+						placeholder="Price"
+						value={form.price}
+						onChange={handleChange}
+						className="form-control mb-2"
+					/>
 
-			<input
-				name="duration"
-				type="number"
-				placeholder="Duration (Months)"
-				value={form.duration}
-				onChange={handleChange}
-				className="form-control mb-2"
-			/>
+					<input
+						name="duration"
+						type="number"
+						placeholder="Duration (Months)"
+						value={form.duration}
+						onChange={handleChange}
+						className="form-control mb-2"
+					/>
 
-			<textarea
-				name="description"
-				placeholder="Description"
-				value={form.description}
-				onChange={handleChange}
-				className="form-control mb-2"
-			/>
+					<textarea
+						name="description"
+						placeholder="Description"
+						value={form.description}
+						onChange={handleChange}
+						className="form-control mb-2"
+					/>
 
-			<select
-				name="status"
-				value={form.status}
-				onChange={handleChange}
-				className="form-control mb-3"
-			>
-				<option value="active">Active</option>
-				<option value="inactive">Inactive</option>
-			</select>
+					<select
+						name="status"
+						value={form.status}
+						onChange={handleChange}
+						className="form-control mb-3"
+					>
+						<option value="active">Active</option>
+						<option value="inactive">Inactive</option>
+					</select>
 
-			<button className="btn btn-primary" onClick={handleSubmit}>
-				Create Plan
-			</button>
-		</div>
+					<button className="btn btn-primary" onClick={handleSubmit}>
+						Create Plan
+					</button>
+				</div>
+			</div>
+		</AdminLayout>
 	);
 };
 

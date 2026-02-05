@@ -3,7 +3,7 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Dashboard from '../pages/admin/Dashboard';
 import PaymentPage from '../pages/admin/PaymentPage';
 import Payment from '../pages/admin/payment';
-import Navbar from '../components/Navbar';
+import Sidebar from '../components/Sidebar';
 import Login from '../pages/auth/Login';
 import ProtectedRoute from './ProtectedRoute';
 import Trainers from '../pages/admin/Trainers';
@@ -13,11 +13,11 @@ const AppRoutes = () => {
 	const location = useLocation();
 
 	// Hide navbar on login page
-	const hideNavbar = location.pathname === '/login';
+	const hideSidebar = location.pathname === '/login';
 
 	return (
 		<>
-			{!hideNavbar && <Navbar />}
+			{!hideSidebar && <Sidebar />}
 
 			<Routes>
 				{/* Default */}

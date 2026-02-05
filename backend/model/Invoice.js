@@ -23,8 +23,12 @@ const invoiceSchema = new mongoose.Schema(
 		},
 		status: {
 			type: String,
-			enum: ['pending', 'paid'],
-			default: 'pending',
+			enum: ['PENDING', 'PAID', 'CANCELLED'],
+			default: 'PENDING',
+		},
+		paymentId: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'Payment',
 		},
 	},
 	{ timestamps: true }

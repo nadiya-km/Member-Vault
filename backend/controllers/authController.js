@@ -47,3 +47,28 @@ exports.logoutAdmin = async (req, res) => {
     res.status(500).json({ success: false, message: "Logout failed" });
   }
 };
+// exports.loginAdmin = async (req, res) => {
+// 	const { email, password } = req.body;
+
+// 	const admin = await Admin.findOne({ email }).select('+password');
+// 	if (!admin) {
+// 		return res.status(401).json({ message: 'Invalid credentials' });
+// 	}
+
+// 	const isMatch = await bcrypt.compare(password, admin.password);
+// 	if (!isMatch) {
+// 		return res.status(401).json({ message: 'Invalid credentials' });
+// 	}
+
+// 	const accessToken = generateAccessToken(admin);
+// 	const refreshToken = generateRefreshToken(admin);
+
+// 	admin.refreshToken = refreshToken;
+// 	await admin.save();
+
+// 	res.json({
+// 		success: true,
+// 		accessToken,
+// 		refreshToken,
+// 	});
+// };

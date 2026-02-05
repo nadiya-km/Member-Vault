@@ -39,7 +39,6 @@ const memberSchema = new mongoose.Schema(
 		},
 		secretKey: {
 			type: String,
-			required: true,
 			index: true,
 			unique: true,
 			select: false,
@@ -52,7 +51,6 @@ memberSchema.pre('save', function (next) {
 	if (!this.secretKey) {
 		this.secretKey = crypto.randomBytes(32).toString('hex');
 	}
-	next();
 });
 //Admin secretKey regeneration method
 memberSchema.methods.regenerateSecretKey = function () {

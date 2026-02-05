@@ -32,7 +32,8 @@ app.use('/api/membership-plan', planRoutes);
 const trainerRoutes = require('./routes/trainer');
 app.use('/api/trainers', trainerRoutes);
 
-
+const memberRoutes = require('./routes/member');
+app.use('/api/members', memberRoutes);
 
 const port = process.env.PORT || 3000;
 

@@ -8,6 +8,7 @@ import Login from '../pages/auth/Login';
 import ProtectedRoute from './ProtectedRoute';
 import Trainers from '../pages/admin/Trainers';
 import MembershipPlans from '../pages/admin/MembershipPlans';
+import Member from '../pages/admin/member/members';
 
 const AppRoutes = () => {
 	const location = useLocation();
@@ -60,7 +61,14 @@ const AppRoutes = () => {
 						</ProtectedRoute>
 					}
 				/>
-
+				<Route
+					path="/members"
+					element={
+						<ProtectedRoute>
+							<Member />
+						</ProtectedRoute>
+					}
+				/>
 				<Route
 					path="/payment/:invoiceId"
 					element={

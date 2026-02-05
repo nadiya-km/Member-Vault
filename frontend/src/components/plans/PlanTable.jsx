@@ -8,6 +8,7 @@ const PlanTable = ({ plans, onRefresh }) => {
 		name: '',
 		durationInMonths: '',
 		price: '',
+		features: '',
 		description: '',
 	});
 
@@ -18,7 +19,7 @@ const PlanTable = ({ plans, onRefresh }) => {
 			name: plan.name,
 			durationInMonths: plan.durationInMonths,
 			price: plan.price,
-            features: plan.features  ||'',
+			features: plan.features || '',
 			description: plan.description || '',
 		});
 	};
@@ -29,34 +30,32 @@ const PlanTable = ({ plans, onRefresh }) => {
 		setSelectedPlan(null);
 		onRefresh();
 	};
-const handleUpdate = async (e) => {
-	e.preventDefault();
+	const handleUpdate = async (e) => {
+		e.preventDefault();
 
-	if (!form.name || !form.durationInMonths || !form.price) {
-		alert('Name, duration and price are required');
-		return;
-	}
+		if (!form.name || !form.durationInMonths || !form.price) {
+			alert('Name, duration and price are required');
+			return;
+		}
 
-	try {
-		const res = await updatePlan(selectedPlan._id, {
-			...form,
-			durationInMonths: Number(form.durationInMonths),
-			price: Number(form.price),
-		});
+		try {
+			const res = await updatePlan(selectedPlan._id, {
+				...form,
+				durationInMonths: Number(form.durationInMonths),
+				price: Number(form.price),
+			});
 
-		// 🔥 IMPORTANT: update modal data immediately
-		setSelectedPlan((prev) => ({
-			...prev,
-			...form,
-		}));
+			setSelectedPlan((prev) => ({
+				...prev,
+				...form,
+			}));
 
-		setEditMode(false);
-		onRefresh();
-	} catch (err) {
-		alert(err?.response?.data?.message || 'Update failed');
-	}
-};
-
+			setEditMode(false);
+			onRefresh();
+		} catch (err) {
+			alert(err?.response?.data?.message || 'Update failed');
+		}
+	};
 
 	const handleChange = (e) => {
 		setForm({ ...form, [e.target.name]: e.target.value });
@@ -132,7 +131,7 @@ const handleUpdate = async (e) => {
 											<strong>Price:</strong> ₹{selectedPlan.price}
 										</p>
 										<p>
-											<strong>Features:</strong> {selectedPlan.description || '-'}
+											<strong>Features:</strong> {selectedPlan.features || '-'}
 										</p>
 										<p>
 											<strong>Description:</strong> {selectedPlan.description || '-'}

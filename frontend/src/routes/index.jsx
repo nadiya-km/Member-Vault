@@ -3,7 +3,7 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Dashboard from '../pages/admin/Dashboard';
 import PaymentPage from '../pages/admin/PaymentPage';
 import Payment from '../pages/admin/payment';
-import Sidebar from '../components/Sidebar';
+import Sidebar from '../components/sidebar/Sidebar';
 import Login from '../pages/auth/Login';
 import ProtectedRoute from './ProtectedRoute';
 import Trainers from '../pages/admin/Trainers';

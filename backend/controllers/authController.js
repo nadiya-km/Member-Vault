@@ -20,6 +20,10 @@ exports.loginAdmin = async (req, res) => {
     const accessToken = generateAccessToken(admin);
     const refreshToken = generateRefreshToken(admin);
 
+    // ✅ SAVE refresh token
+    admin.refreshToken = refreshToken;
+    await admin.save();
+
     res.json({
       success: true,
       accessToken,
@@ -31,22 +35,43 @@ exports.loginAdmin = async (req, res) => {
       },
     });
   } catch (err) {
-    console.error("LOGIN ERROR:", err.message);
-  res.status(500).json({ success: false, message: err.message });
+    res.status(500).json({ success: false, message: err.message });
   }
 };
 
+exports.refreshToken = async (req, res) => {
+  const { refreshToken } = req.body;
+
+  if (!refreshToken)
+    return res.status(401).json({ message: "No refresh token" });
+
+  try {
+    const decoded = jwt.verify(
+      refreshToken,
+      process.env.JWT_REFRESH_SECRET
+    );
+
+    const admin = await Admin.findById(decoded.id);
+    if (!admin || admin.refreshToken !== refreshToken) {
+      return res.status(403).json({ message: "Invalid refresh token" });
+    }
+
+    const newAccessToken = generateAccessToken(admin);
+
+    res.json({ accessToken: newAccessToken });
+  } catch (err) {
+    return res.status(403).json({ message: "Refresh token expired" });
+  }
+};
 
 exports.logoutAdmin = async (req, res) => {
-  try {
-    return res.json({
-      success: true,
-      message: "Logged out successfully",
-    });
-  } catch (err) {
-    res.status(500).json({ success: false, message: "Logout failed" });
-  }
+  await Admin.findByIdAndUpdate(req.admin.id, {
+    refreshToken: null,
+  });
+
+  res.json({ success: true, message: "Logged out successfully" });
 };
+
 // exports.loginAdmin = async (req, res) => {
 // 	const { email, password } = req.body;
 

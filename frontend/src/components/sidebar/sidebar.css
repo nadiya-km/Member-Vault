@@ -1,94 +1,111 @@
+/* ===== DESKTOP SIDEBAR ===== */
 #sidebar {
-  width: 240px;
+  width: 250px;
   height: 100vh;
-  background: #f4f5f7;
-  border-right: 1px solid #ddd;
+  background: #ffffff;
+  border-right: 1px solid #e5e7eb;
   padding: 20px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
   position: fixed;
   top: 0;
   left: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .logo {
-  margin-bottom: 15px;
-  font-size: 1.3rem;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.links {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.nav-link {
+  padding: 12px 14px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-size: 0.95rem;
+  color: #374151;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  transition: 0.25s;
+}
+
+.nav-link.active {
+  background: #2563eb;
+  color: #ffffff;
   font-weight: 600;
 }
+
+.nav-link:hover {
+  background: #e0e7ff;
+  color: #1e3a8a;
+}
+
+.logout {
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #ef4444;
+  background: #fee2e2;
+  color: #b91c1c;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.logout:hover {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+/* ===== MOBILE BOTTOM NAV ===== */
 .bottom-nav {
   display: none;
 }
 
-
-.links {
-	display: flex;
-	flex-direction: column;
-	gap: 12px;
-}
-
-.nav-link {
-	padding: 12px;
-	border-radius: 8px;
-	background: #fff;
-	color: #000;
-	text-decoration: none;
-	border: 1px solid #e0e0e0;
-	transition: 0.2s;
-}
-
-/* ✅ ACTIVE */
-.nav-link.active {
-	background-color: #ff2e4b;
-	color: #fff !important;
-	font-weight: 600;
-}
-
-/* ✅ HOVER */
-.nav-link:hover {
-	background-color: #fa8d9b;
-	color: #fff;
-}
-
-.logout {
-	width: 100%;
-	padding: 10px;
-	border: 1px solid #ccc;
-	background: #fff;
-	cursor: pointer;
-	border-radius: 8px;
-}
-
+/* ===== MOBILE VIEW ===== */
 @media (max-width: 768px) {
-  /* Hide sidebar */
   #sidebar {
     display: none;
   }
 
-  /* Show bottom nav */
   .bottom-nav {
     display: flex;
     position: fixed;
     bottom: 0;
     left: 0;
+    height: 64px;
     width: 100%;
-    height: 60px;
     background: #ffffff;
-    border-top: 1px solid #ddd;
+    border-top: 1px solid #e5e7eb;
     justify-content: space-around;
     align-items: center;
     z-index: 1000;
   }
 
-  .bottom-nav a {
+  .bottom-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     text-decoration: none;
-    font-size: 1.4rem;
-    color: #555;
+    color: #6b7280;
+    font-size: 0.7rem;
+    gap: 2px;
   }
 
-  .bottom-nav a.active {
-    color: #ff2e4b;
+  .bottom-link .icon {
+    font-size: 1.4rem;
+  }
+
+  .bottom-link.active {
+    color: #2563eb;
+    font-weight: 600;
   }
 }
-

@@ -18,17 +18,21 @@ const TrainerTable = ({ trainers, onRefresh }) => {
 
 	/* ================= DATATABLE INIT ================= */
 	useEffect(() => {
-		if (!trainers.length) return;
+	if (!trainers.length) return;
 
-		const table = $(tableRef.current).DataTable({
-			destroy: true,
-			responsive: true,
-			pageLength: 10,
-			columnDefs: [{ orderable: false, targets: 4 }],
-		});
+	const table = $(tableRef.current).DataTable({
+		destroy: true,
+		responsive: false,   
+		scrollX: true,       
+		autoWidth: false,
+		pageLength: 10,
+		columnDefs: [
+			{ orderable: false, targets: 4 },
+		],
+	});
 
-		return () => table.destroy();
-	}, [trainers]);
+	return () => table.destroy();
+}, [trainers]);
 
 	/* ================= HANDLERS ================= */
 	const handleView = (trainer) => {

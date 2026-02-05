@@ -1,8 +1,14 @@
-import { useState } from 'react';
-import { deletePlan, updatePlan } from '../../services/planService';
-import AdminLayout from '../../components/layout/AdminLayout';
+import { useState, useEffect, useRef } from 'react';
+import $ from 'jquery';
 
-const PlanTable = ({ plans, onRefresh }) => {
+import 'datatables.net';
+import 'datatables.net-responsive';
+
+import { deletePlan, updatePlan } from '../../services/planService';
+
+const PlanTable = ({ plans = [], onRefresh }) => {
+	const tableRef = useRef(null);
+
 	const [selectedPlan, setSelectedPlan] = useState(null);
 	const [editMode, setEditMode] = useState(false);
 	const [form, setForm] = useState({
@@ -13,6 +19,23 @@ const PlanTable = ({ plans, onRefresh }) => {
 		description: '',
 	});
 
+	/* ================= DATATABLE INIT ================= */
+	useEffect(() => {
+		if (!plans.length) return;
+
+		const table = $(tableRef.current).DataTable({
+			destroy: true,
+			responsive: false, // 🔥 prevent auto-hide
+			scrollX: true,     // 🔥 mobile scroll
+			autoWidth: false,
+			pageLength: 10,
+			columnDefs: [{ orderable: false, targets: 5 }],
+		});
+
+		return () => table.destroy();
+	}, [plans]);
+
+	/* ================= HANDLERS ================= */
 	const handleView = (plan) => {
 		setSelectedPlan(plan);
 		setEditMode(false);
@@ -25,12 +48,16 @@ const PlanTable = ({ plans, onRefresh }) => {
 		});
 	};
 
+	const handleChange = (e) =>
+		setForm({ ...form, [e.target.name]: e.target.value });
+
 	const handleDelete = async () => {
 		if (!window.confirm('Disable this plan?')) return;
 		await deletePlan(selectedPlan._id);
 		setSelectedPlan(null);
 		onRefresh();
 	};
+
 	const handleUpdate = async (e) => {
 		e.preventDefault();
 
@@ -39,33 +66,24 @@ const PlanTable = ({ plans, onRefresh }) => {
 			return;
 		}
 
-		try {
-			const res = await updatePlan(selectedPlan._id, {
-				...form,
-				durationInMonths: Number(form.durationInMonths),
-				price: Number(form.price),
-			});
+		await updatePlan(selectedPlan._id, {
+			...form,
+			durationInMonths: Number(form.durationInMonths),
+			price: Number(form.price),
+		});
 
-			setSelectedPlan((prev) => ({
-				...prev,
-				...form,
-			}));
-
-			setEditMode(false);
-			onRefresh();
-		} catch (err) {
-			alert(err?.response?.data?.message || 'Update failed');
-		}
+		setEditMode(false);
+		onRefresh();
 	};
 
-	const handleChange = (e) => {
-		setForm({ ...form, [e.target.name]: e.target.value });
-	};
-
+	/* ================= UI ================= */
 	return (
 		<>
 			<div className="table-responsive">
-				<table className="table table-bordered table-hover align-middle">
+				<table
+					ref={tableRef}
+					className="display nowrap table table-bordered table-hover align-middle w-100"
+				>
 					<thead className="table-dark">
 						<tr>
 							<th>Name</th>
@@ -80,7 +98,7 @@ const PlanTable = ({ plans, onRefresh }) => {
 					<tbody>
 						{plans.length === 0 ? (
 							<tr>
-								<td colSpan="5" className="text-center">
+								<td colSpan="6" className="text-center">
 									No plans found
 								</td>
 							</tr>
@@ -109,34 +127,26 @@ const PlanTable = ({ plans, onRefresh }) => {
 				</table>
 			</div>
 
-			{/* ===== MODAL ===== */}
+			{/* ================= MODAL ================= */}
 			<div className="modal fade" id="planModal" tabIndex="-1">
-				<div className="modal-dialog modal-dialog-centered">
+				<div className="modal-dialog modal-dialog-centered modal-md">
 					<div className="modal-content">
 						<div className="modal-header">
-							<h5 className="modal-title">{editMode ? 'Edit Plan' : 'Plan Details'}</h5>
-							<button type="button" className="btn-close" data-bs-dismiss="modal"></button>
+							<h5 className="modal-title">
+								{editMode ? 'Edit Plan' : 'Plan Details'}
+							</h5>
+							<button type="button" className="btn-close" data-bs-dismiss="modal" />
 						</div>
 
 						<div className="modal-body">
 							{!editMode ? (
 								selectedPlan && (
 									<>
-										<p>
-											<strong>Name:</strong> {selectedPlan.name}
-										</p>
-										<p>
-											<strong>Duration:</strong> {selectedPlan.durationInMonths} months
-										</p>
-										<p>
-											<strong>Price:</strong> ₹{selectedPlan.price}
-										</p>
-										<p>
-											<strong>Features:</strong> {selectedPlan.features || '-'}
-										</p>
-										<p>
-											<strong>Description:</strong> {selectedPlan.description || '-'}
-										</p>
+										<p><strong>Name:</strong> {selectedPlan.name}</p>
+										<p><strong>Duration:</strong> {selectedPlan.durationInMonths} months</p>
+										<p><strong>Price:</strong> ₹{selectedPlan.price}</p>
+										<p><strong>Features:</strong> {selectedPlan.features || '-'}</p>
+										<p><strong>Description:</strong> {selectedPlan.description || '-'}</p>
 									</>
 								)
 							) : (
@@ -165,7 +175,7 @@ const PlanTable = ({ plans, onRefresh }) => {
 										placeholder="Price"
 									/>
 									<textarea
-										className="form-control"
+										className="form-control mb-2"
 										name="features"
 										value={form.features}
 										onChange={handleChange}
@@ -178,7 +188,7 @@ const PlanTable = ({ plans, onRefresh }) => {
 										onChange={handleChange}
 										placeholder="Description"
 									/>
-									<button type="submit" className="btn btn-success mt-3">
+									<button className="btn btn-success w-100 mt-3">
 										Save Changes
 									</button>
 								</form>
@@ -188,11 +198,14 @@ const PlanTable = ({ plans, onRefresh }) => {
 						<div className="modal-footer">
 							{!editMode ? (
 								<>
-									<button className="btn btn-outline-primary" onClick={() => setEditMode(true)}>
+									<button
+										className="btn btn-outline-primary btn-sm"
+										onClick={() => setEditMode(true)}
+									>
 										Edit
 									</button>
 									<button
-										className="btn btn-outline-danger"
+										className="btn btn-outline-danger btn-sm"
 										onClick={handleDelete}
 										data-bs-dismiss="modal"
 									>
@@ -200,14 +213,18 @@ const PlanTable = ({ plans, onRefresh }) => {
 									</button>
 								</>
 							) : (
-								<button className="btn btn-secondary" onClick={() => setEditMode(false)}>
+								<button
+									className="btn btn-secondary btn-sm"
+									onClick={() => setEditMode(false)}
+								>
 									Cancel
 								</button>
 							)}
-							<button className="btn btn-secondary" data-bs-dismiss="modal">
+							<button className="btn btn-secondary btn-sm" data-bs-dismiss="modal">
 								Close
 							</button>
 						</div>
+
 					</div>
 				</div>
 			</div>

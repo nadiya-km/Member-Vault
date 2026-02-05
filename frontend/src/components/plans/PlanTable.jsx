@@ -8,6 +8,7 @@ const PlanTable = ({ plans, onRefresh }) => {
 		name: '',
 		durationInMonths: '',
 		price: '',
+		features: '',
 		description: '',
 	});
 
@@ -130,7 +131,7 @@ const PlanTable = ({ plans, onRefresh }) => {
 											<strong>Price:</strong> ₹{selectedPlan.price}
 										</p>
 										<p>
-											<strong>Features:</strong> {selectedPlan.description || '-'}
+											<strong>Features:</strong> {selectedPlan.features || '-'}
 										</p>
 										<p>
 											<strong>Description:</strong> {selectedPlan.description || '-'}

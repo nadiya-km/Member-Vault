@@ -1,3 +1,5 @@
+const crypto = require('crypto');
+
 const mongoose = require('mongoose');
 
 const memberSchema = new mongoose.Schema(
@@ -26,9 +28,10 @@ const memberSchema = new mongoose.Schema(
 			type: Number,
 		},
 		personalTrainer: {
-			name: String,
-			phone: String,
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'PersonalTrainer',
 		},
+
 		status: {
 			type: String,
 			enum: ['active', 'inactive'],
@@ -39,6 +42,7 @@ const memberSchema = new mongoose.Schema(
 			required: true,
 			index: true,
 			unique: true,
+			select: false,
 		},
 	},
 	{ timestamps: true }

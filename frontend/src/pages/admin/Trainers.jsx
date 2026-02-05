@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { getTrainers } from '../../services/trainerService';
 import TrainerForm from '../../components/trainers/TrainerForm';
 import TrainerTable from '../../components/trainers/TrainerTable';
+import AdminLayout from '../../components/layout/AdminLayout';
 
 const Trainers = () => {
 	const [trainers, setTrainers] = useState([]);
@@ -24,18 +25,27 @@ const Trainers = () => {
 	}, []);
 
 	return (
-		<div className="p-4">
-			<div className="d-flex justify-content-between align-items-center mb-3">
-				<h2>Personal Trainers</h2>
-				<button className="btn btn-dark" onClick={() => setShowForm(!showForm)}>
-					{showForm ? 'Close' : '+ Add Trainer'}
-				</button>
+		<AdminLayout>
+			<div className="p-4">
+				<div className="d-flex justify-content-between align-items-center mb-3">
+					<h2>Personal Trainers</h2>
+					<button
+						className="btn btn-dark"
+						onClick={() => setShowForm(!showForm)}
+					>
+						{showForm ? 'Close' : '+ Add Trainer'}
+					</button>
+				</div>
+
+				{showForm && <TrainerForm onSuccess={fetchTrainers} />}
+
+				{loading ? (
+					<p>Loading...</p>
+				) : (
+					<TrainerTable trainers={trainers} onRefresh={fetchTrainers} />
+				)}
 			</div>
-
-			{showForm && <TrainerForm onSuccess={fetchTrainers} />}
-
-			{loading ? <p>Loading...</p> : <TrainerTable trainers={trainers} onRefresh={fetchTrainers} />}
-		</div>
+		</AdminLayout>
 	);
 };
 

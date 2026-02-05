@@ -1,15 +1,34 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import api from '../../services/api';
 
-
 const MemberForm = ({ closeForm, refreshMembers }) => {
+	const [trainers, setTrainers] = useState([]);
+
 	const [formData, setFormData] = useState({
 		name: '',
 		email: '',
 		phone: '',
 		whatsappNumber: '',
 		age: '',
+		personalTrainer: '', // 👈 optional
 	});
+
+	useEffect(() => {
+		fetchTrainers();
+	}, []);
+
+	const fetchTrainers = async () => {
+		try {
+			const res = await api.get('/trainers', {
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem('token')}`,
+				},
+			});
+			setTrainers(res.data.data);
+		} catch {
+			console.error('Failed to load trainers');
+		}
+	};
 
 	const handleChange = (e) => {
 		setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -19,11 +38,18 @@ const MemberForm = ({ closeForm, refreshMembers }) => {
 		e.preventDefault();
 
 		try {
-			await api.post('/members', formData, {
-				headers: {
-					Authorization: `Bearer ${localStorage.getItem('token')}`,
+			await api.post(
+				'/members',
+				{
+					...formData,
+					personalTrainer: formData.personalTrainer || null, // ✅ important
 				},
-			});
+				{
+					headers: {
+						Authorization: `Bearer ${localStorage.getItem('token')}`,
+					},
+				}
+			);
 
 			refreshMembers();
 			closeForm();
@@ -77,9 +103,19 @@ const MemberForm = ({ closeForm, refreshMembers }) => {
 					type="number"
 					name="age"
 					placeholder="Age"
-					className="border p-2 w-full mb-4"
+					className="border p-2 w-full mb-2"
 					onChange={handleChange}
 				/>
+
+				{/* ✅ Personal Trainer (Optional) */}
+				<select name="personalTrainer" className="border p-2 w-full mb-4" onChange={handleChange}>
+					<option value="">No Personal Trainer</option>
+					{trainers.map((t) => (
+						<option key={t._id} value={t._id}>
+							{t.name}
+						</option>
+					))}
+				</select>
 
 				<div className="flex justify-between">
 					<button type="button" className="bg-gray-400 px-4 py-2 rounded" onClick={closeForm}>

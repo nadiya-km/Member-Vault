@@ -6,10 +6,13 @@ const {
 	getAllTrainers,
 	updateTrainer,
 	deleteTrainer,
+	getActiveTrainers,
 } = require('../controllers/trainerController');
 
 router.route('/').post(auth, createTrainer).get(auth, getAllTrainers);
 
 router.route('/:id').put(auth, updateTrainer).delete(auth, deleteTrainer);
+
+router.get('/trainers/active', auth, getActiveTrainers);
 
 module.exports = router;

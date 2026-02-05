@@ -39,6 +39,10 @@ exports.getAllTrainers = async (req, res) => {
 		res.status(500).json({ success: false, message: e.message });
 	}
 };
+exports.getActiveTrainers = async (req, res) => {
+	const trainers = await PersonalTrainer.find({ status: 'active' });
+	res.json(trainers);
+};
 
 exports.updateTrainer = async (req, res) => {
 	try {

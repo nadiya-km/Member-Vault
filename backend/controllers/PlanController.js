@@ -2,8 +2,8 @@ const MembershipPlan = require('../model/MembershipPlan');
 
 exports.createPlan = async (req, res) => {
 	try {
-		const { name, durationInMonths, price, description,features } = req.body;
-		if (!name || !durationInMonths || !price ||!features) {
+		const { name, durationInMonths, price, description, features } = req.body;
+		if (!name || !durationInMonths || !price || !features) {
 			return res.status(400).json({
 				success: false,
 				message: 'Name , duration and price are required',
@@ -25,7 +25,7 @@ exports.createPlan = async (req, res) => {
 		res.status(500).json({ success: false, message: e.message });
 	}
 };
-exports.getAllPlan = async (req, res) => {
+exports.getAllPlans = async (req, res) => {
 	try {
 		const plans = await MembershipPlan.find({ isActive: true }).sort({ createdAt: -1 });
 		res.json({
@@ -39,6 +39,7 @@ exports.getAllPlan = async (req, res) => {
 		});
 	}
 };
+
 exports.updatePlan = async (req, res) => {
 	try {
 		const { id } = req.params;

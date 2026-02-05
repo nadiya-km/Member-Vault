@@ -26,6 +26,11 @@ const membershipSchema = new mongoose.Schema(
 			enum: ['active', 'expired'],
 			default: 'active',
 		},
+		personalTrainer: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'PersonalTrainer',
+			default: null,
+		},
 	},
 	{ timestamps: true }
 );

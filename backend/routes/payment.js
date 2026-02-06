@@ -1,14 +1,22 @@
 const express = require("express");
 const router = express.Router();
 
-const authMiddleware = require("../middleware/auth");
+const {
+  createOrder,
+  savePayment,
+  verifyAndSavePayment,
+  createCashfreeOrder,
+  verifyCashfreePayment,
+} = require("../controllers/paymentController");
 
-const {createOrder,savePayment,verifyAndSavePayment} = require("../controllers/paymentController");
+/* 🔓 PUBLIC PAYMENT ROUTES */
+router.post("/create-order", createOrder);
+router.post("/verify-payment", verifyAndSavePayment);
 
+router.post("/cashfree/create-order", createCashfreeOrder);
+router.post("/cashfree/verify", verifyCashfreePayment);
 
-router.post('/create-order',authMiddleware, createOrder);
-router.post('/save-payment',authMiddleware, savePayment);
-router.post('/verify-payment',authMiddleware, verifyAndSavePayment);
-
+/* 🔒 ADMIN CASH */
+router.post("/save-payment", savePayment);
 
 module.exports = router;

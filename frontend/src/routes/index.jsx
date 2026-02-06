@@ -13,6 +13,7 @@ import EditMembership from "../pages/admin/member/editMembership";
 import Payment from "../pages/admin/payment";
 import PaymentPage from "../pages/admin/PaymentPage";
 import MemberProfile from "../pages/member/profile";
+import EditMember from "../pages/admin/member/EditMember"; 
 
 const AppRoutes = () => {
   return (
@@ -45,6 +46,7 @@ const AppRoutes = () => {
     <Route path="trainers" element={<Trainers />} />
     <Route path="payments" element={<Payment />} />
 -   <Route path="payments/:invoiceId" element={<PaymentPage />} />
+    <Route path="members/:id/edit" element={<EditMember />} />
   </Route>
 
   <Route path="*" element={<Navigate to="/login" />} />

@@ -15,18 +15,38 @@ const PaymentPage = () => {
 	const [modalType, setModalType] = useState('success');
 	const [modalMessage, setModalMessage] = useState('');
 
-	useEffect(() => {
+
+ useEffect(() => {
+  if (!invoiceId || invoiceId === "undefined") {
+    console.error("Invalid invoiceId:", invoiceId);
+    return;
+  }
+
   const fetchInvoice = async () => {
-    const res = await api.get(`/invoices/${invoiceId}`)
-    setInvoice(res.data.invoice);
-    setMember(res.data.member);
+    try {
+      const res = await api.get(`/invoices/${invoiceId}`);
+      setInvoice(res.data.invoice);
+      setMember(res.data.member);
+    } catch (err) {
+      console.error("Invoice fetch failed", err);
+    }
   };
+
   fetchInvoice();
 }, [invoiceId]);
 
+useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
+  const orderId = params.get("order_id");
+
+  if (orderId && invoice && member) {
+    verifyCashfree(orderId);
+  }
+}, [invoice, member]);
 	// MAIN HANDLER
 	const openPayment = () => {
 		if (paymentMethod === 'RAZORPAY') openRazorpay();
+		 if (paymentMethod === 'CASHFREE') openCashfree();
 		if (paymentMethod === 'CASH') saveCashPayment();
 	};
 	const handleModalOk = () => {
@@ -86,6 +106,54 @@ const PaymentPage = () => {
 		}
 	};
 
+	const openCashfree = async () => {
+  try {
+    const res = await api.post("/payments/cashfree/create-order", {
+      invoiceId: invoice._id,
+      amount: invoice.amount,
+      memberId: member._id,
+    });
+
+    if (!window.Cashfree) {
+      throw new Error("Cashfree SDK not loaded");
+    }
+
+    const cashfree = new window.Cashfree({
+      mode: "sandbox", // 🔁 change to "production" later
+    });
+
+    await cashfree.checkout({
+      paymentSessionId: res.data.payment_session_id,
+      redirectTarget: "_self",
+    });
+
+  } catch (err) {
+    console.error("Cashfree init error:", err);
+    setModalType("error");
+    setModalMessage(err.message || "Cashfree initialization failed");
+    setShowModal(true);
+  }
+};
+const verifyCashfree = async (orderId) => {
+  try {
+    const res = await api.post("/payments/cashfree/verify", {
+      orderId,
+      invoiceId: invoice._id,
+      memberId: member._id,
+      amount: invoice.amount,
+    });
+
+    setModalType("success");
+    setModalMessage("Payment successful 🎉");
+    setShowModal(true);
+  } catch (err) {
+    setModalType("error");
+    setModalMessage(
+      err.response?.data?.message || "Payment verification failed"
+    );
+    setShowModal(true);
+  }
+};
 	// ⚫ CASH
 	const saveCashPayment = async () => {
 		try {
@@ -163,6 +231,17 @@ return (
               Cash
             </label>
           </div> */}
+		  <div className="form-check mb-2">
+  <input
+    className="form-check-input"
+    type="radio"
+    checked={paymentMethod === 'CASHFREE'}
+    onChange={() => setPaymentMethod('CASHFREE')}
+  />
+  <label className="form-check-label">
+    Cashfree (UPI / Card / Netbanking)
+  </label>
+</div>
         </div>
 
         <button

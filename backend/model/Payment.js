@@ -25,23 +25,24 @@ const paymentSchema = new mongoose.Schema(
 			enum: ['UPI', 'CARD', 'NET_BANKING', 'CASH', 'BANK_TRANSFER'],
 			required: true,
 		},
+		transactionId: {
+			type: String,
+			default: null,
+		},
 
 		amount: {
 			type: Number,
 			required: true,
 		},
-
+		paymentType: {
+			type: String,
+			enum: ['CASH', 'ONLINE'],
+			required: true,
+		},
 		status: {
 			type: String,
 			enum: ['SUCCESS', 'FAILED', 'PENDING'],
 			default: 'PENDING',
-		},
-
-		transactionId: {
-			type: String,
-			required: function () {
-				return this.gateway !== 'OFFLINE';
-			},
 		},
 
 		paidAt: Date,

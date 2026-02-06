@@ -1,8 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
-const { addMembership, getMemberMembership } = require('../controllers/membershipController');
-router.post('/members/:id/membership', addMembership);
-router.get('/members/:id/membership', getMemberMembership);
 
+const {
+	addMembership,
+	getMemberMembership,
+	editMembership,
+} = require('../controllers/membershipController');
+
+router.post('/:id/membership', auth, addMembership);
+router.get('/:id/membership', auth, getMemberMembership);
+router.put('/:id/membership', auth, editMembership);
 module.exports = router;

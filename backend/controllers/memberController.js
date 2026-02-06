@@ -38,3 +38,22 @@ exports.getMemberDetails = async (req, res) => {
 
 	res.json({ data: { member, membership } });
 };
+
+
+
+
+
+exports.getDashboard = async (req, res) => {
+  try {
+    const totalMembers = await Member.countDocuments({
+      status: 'active',
+    });
+
+    res.json({
+      admin: req.admin, 
+      totalMembers,
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Dashboard error' });
+  }
+};

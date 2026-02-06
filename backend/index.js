@@ -1,4 +1,5 @@
 require('dotenv').config();
+require('./cron/membershipReminder');
 
 const express = require('express');
 const cors = require('cors');
@@ -19,7 +20,6 @@ app.use(express.urlencoded({ extended: true }));
 // // app.get('/api/testing', (req, res) => {
 // // 	res.json({ status: 'ok', message: 'backend is connected' });
 // // });
-
 
 const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);

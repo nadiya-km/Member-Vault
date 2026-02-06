@@ -10,6 +10,7 @@ const MemberDetails = () => {
 	const [member, setMember] = useState(null);
 	const [membership, setMembership] = useState(null);
 	const [loadingMembership, setLoadingMembership] = useState(true);
+	const [profileLink, setProfileLink] = useState('');
 
 	useEffect(() => {
 		const fetchMember = async () => {
@@ -18,7 +19,9 @@ const MemberDetails = () => {
 					Authorization: `Bearer ${localStorage.getItem('token')}`,
 				},
 			});
-			setMember(res.data.data.member || res.data.data);
+			setMember(res.data.data.member);
+			setProfileLink(res.data.data.profileLink);
+
 		};
 
 		const fetchMembership = async () => {
@@ -118,7 +121,21 @@ const MemberDetails = () => {
 									<tr>
 										<th>Status</th>
 										<td>
-											<span className="badge bg-success">Active</span>
+											{membership.status === 'active' && (
+												<span className="badge bg-success">Active</span>
+											)}
+
+											{membership.status === 'paused' && (
+												<span className="badge bg-secondary">Paused</span>
+											)}
+
+											{membership.status === 'pending_payment' && (
+												<span className="badge bg-warning text-dark">Pending Payment</span>
+											)}
+
+											{membership.status === 'cancelled' && (
+												<span className="badge bg-danger">Cancelled</span>
+											)}
 										</td>
 									</tr>
 
@@ -133,16 +150,35 @@ const MemberDetails = () => {
 						)}
 					</div>
 				</div>
+				{/* PROFILE LINK – always visible */}
+				<div className="card mt-3">
+					<div className="card-header">
+						<strong>Member Profile Link</strong>
+					</div>
+					<div className="card-body">
+						<input type="text" className="form-control mb-2" value={profileLink || ''} readOnly />
+						<button
+							className="btn btn-outline-primary"
+							disabled={!profileLink}
+							onClick={() => navigator.clipboard.writeText(profileLink)}
+						>
+							Copy Link
+						</button>
+					</div>
+				</div>
 
 				{/* ACTION BUTTONS */}
 				<div className="row g-2 mt-4">
 					<div className="col-md-4 col-12">
 						<button
 							className="btn btn-secondary w-100"
-							disabled={!!membership}
-							onClick={() => navigate(`/admin/members/${id}/add-membership`)}
+							onClick={() =>
+								membership
+									? navigate(`/admin/members/${id}/edit-membership`)
+									: navigate(`/admin/members/${id}/add-membership`)
+							}
 						>
-							{membership ? 'Membership Active' : 'Add Membership'}
+							{membership ? 'Edit Membership' : 'Add Membership'}
 						</button>
 					</div>
 
@@ -168,5 +204,4 @@ const MemberDetails = () => {
 		</AdminLayout>
 	);
 };
-
 export default MemberDetails;

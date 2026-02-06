@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../../services/api';
 
-
 const MemberDetails = () => {
 	const { id } = useParams();
 	const navigate = useNavigate();
@@ -21,7 +20,6 @@ const MemberDetails = () => {
 			});
 			setMember(res.data.data.member);
 			setProfileLink(res.data.data.profileLink);
-
 		};
 
 		const fetchMembership = async () => {
@@ -165,6 +163,18 @@ const MemberDetails = () => {
 							Copy Link
 						</button>
 					</div>
+					<button
+						className="btn btn-outline-danger ms-2"
+						onClick={async () => {
+							if (!window.confirm('This will invalidate the old link. Continue?')) return;
+
+							const res = await api.post(`/members/${id}/regenerate-link`);
+							setProfileLink(res.data.profileLink);
+							alert('New profile link generated');
+						}}
+					>
+						Regenerate Link
+					</button>
 				</div>
 
 				{/* ACTION BUTTONS */}

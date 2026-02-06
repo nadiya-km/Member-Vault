@@ -37,25 +37,29 @@ exports.addMembership = async (req, res) => {
 		}
 
 		//  Create membership
-		const membership = await Membership.create({
-			memberId: id,
-			planId,
-			startDate,
-			endDate,
-			status: paymentType === 'CASH' ? 'active' : 'pending_payment',
-			personalTrainer: personalTrainer || null,
-			paymentType,
-		});
+	const membership = await Membership.create({
+  memberId: id,
+  planId,
+  startDate,
+  endDate,
+  status: paymentType === 'CASH' ? 'active' : 'pending_payment',
+  personalTrainer: personalTrainer || null,
+  paymentType,
+});
 
-		//  Create invoice
-		const invoice = await Invoice.create({
-			invoiceNumber: `INV-${Date.now()}`,
-			memberId: id,
-			membershipId: membership._id,
-			amount: plan.price,
-			paymentMethod: paymentType,
-			status: paymentType === 'CASH' ? 'PAID' : 'PENDING',
-		});
+// create invoice
+const invoice = await Invoice.create({
+  invoiceNumber: `INV-${Date.now()}`,
+  memberId: id,
+  membershipId: membership._id,
+  amount: plan.price,
+  paymentMethod: paymentType,
+  status: paymentType === 'CASH' ? 'PAID' : 'PENDING',
+});
+
+// 🔥 LINK INVOICE TO MEMBERSHIP
+membership.invoiceId = invoice._id;
+await membership.save();
 
 		// Create payment record
 		await Payment.create({

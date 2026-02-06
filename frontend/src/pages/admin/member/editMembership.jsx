@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../../services/api';
-import AdminLayout from '../../../components/layout/AdminLayout';
+
 
 const EditMembership = () => {
 	const { id } = useParams();
@@ -57,7 +57,7 @@ const EditMembership = () => {
 	if (!membership) return null;
 
 	return (
-		<AdminLayout>
+		<>
 			<div className="container mt-4">
 				<div className="card">
 					<div className="card-header bg-warning">
@@ -142,7 +142,7 @@ const EditMembership = () => {
 					</div>
 				</div>
 			</div>
-		</AdminLayout>
+		</>
 	);
 };
 //export

@@ -17,36 +17,38 @@ import MemberProfile from "../pages/member/profile";
 const AppRoutes = () => {
   return (
     <Routes>
-      {/* Auth */}
-      <Route path="/login" element={<Login />} />
+  {/* Auth */}
+  <Route path="/login" element={<Login />} />
 
-      {/* Member profile (no admin layout) */}
-      <Route path="/member/profile/:secretKey" element={<MemberProfile />} />
+  {/* Member profile (public) */}
+  <Route path="/member/profile/:secretKey" element={<MemberProfile />} />
 
-      {/* Admin Layout */}
-      <Route
-        path="/admin"
-        element={
-          <ProtectedRoute>
-            <AdminLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<Navigate to="dashboard" />} />
-        <Route path="dashboard" element={<Dashboard />} />
-        <Route path="plans" element={<MembershipPlans />} />
-        <Route path="members" element={<Member />} />
-        <Route path="members/:id" element={<MemberDetails />} />
-        <Route path="members/:id/add-membership" element={<AddMembership />} />
-        <Route path="members/:id/edit-membership" element={<EditMembership />} />
-        <Route path="trainers" element={<Trainers />} />
-        <Route path="payments" element={<Payment />} />
-        <Route path="payments/:invoiceId" element={<PaymentPage />} />
-      </Route>
++ {/* Public Payment Page (NO admin layout) */}
++ <Route path="/payment/:invoiceId" element={<PaymentPage />} />
 
-      {/* Fallback */}
-      <Route path="*" element={<Navigate to="/login" />} />
-    </Routes>
+  {/* Admin Layout */}
+  <Route
+    path="/admin"
+    element={
+      <ProtectedRoute>
+        <AdminLayout />
+      </ProtectedRoute>
+    }
+  >
+    <Route index element={<Navigate to="dashboard" />} />
+    <Route path="dashboard" element={<Dashboard />} />
+    <Route path="plans" element={<MembershipPlans />} />
+    <Route path="members" element={<Member />} />
+    <Route path="members/:id" element={<MemberDetails />} />
+    <Route path="members/:id/add-membership" element={<AddMembership />} />
+    <Route path="members/:id/edit-membership" element={<EditMembership />} />
+    <Route path="trainers" element={<Trainers />} />
+    <Route path="payments" element={<Payment />} />
+-   <Route path="payments/:invoiceId" element={<PaymentPage />} />
+  </Route>
+
+  <Route path="*" element={<Navigate to="/login" />} />
+</Routes>
   );
 };
 

@@ -39,6 +39,9 @@ app.use('/api/membership-plans', membershipPlanRoutes);
 const paymentRoutes = require('./routes/payment');
 app.use('/api/payments', paymentRoutes);
 
+const invoiceRoutes = require('./routes/invoiceRoutes');
+app.use('/api/invoices', invoiceRoutes);
+
 const port = process.env.PORT || 3000;
 
 app.listen(port, async () => {

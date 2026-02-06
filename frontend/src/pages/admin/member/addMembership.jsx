@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../../services/api';
-import AdminLayout from '../../../components/layout/AdminLayout';
+
 
 const AddMembership = () => {
   const { id } = useParams(); // memberId
@@ -76,7 +76,7 @@ const AddMembership = () => {
   };
 
   return (
-    <AdminLayout>
+    <>
       <div className="container mt-4">
         <div className="card shadow-sm">
           <div className="card-header bg-dark text-white">
@@ -182,7 +182,7 @@ const AddMembership = () => {
           </div>
         </div>
       </div>
-    </AdminLayout>
+    </>
   );
 };
 

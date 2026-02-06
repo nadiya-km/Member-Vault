@@ -6,20 +6,8 @@ const Payment = require('../model/Payment');
 exports.addMembership = async (req, res) => {
 	try {
 		const { id } = req.params;
-		const { planId, startDate, endDate, personalTrainer, paymentType } = req.body;
+		const { planId, personalTrainer, paymentType } = req.body;
 
-		// Check existing active membership
-		const existing = await Membership.findOne({
-			memberId: id,
-			status: 'active',
-		});
-
-		if (existing) {
-			return res.status(400).json({
-				success: false,
-				message: 'Active membership already exists',
-			});
-		}
 		if (!['CASH', 'ONLINE'].includes(paymentType)) {
 			return res.status(400).json({
 				success: false,
@@ -27,7 +15,6 @@ exports.addMembership = async (req, res) => {
 			});
 		}
 
-		// Get membership plan
 		const plan = await MembershipPlan.findById(planId);
 		if (!plan) {
 			return res.status(404).json({
@@ -36,32 +23,47 @@ exports.addMembership = async (req, res) => {
 			});
 		}
 
-		//  Create membership
-	const membership = await Membership.create({
-  memberId: id,
-  planId,
-  startDate,
-  endDate,
-  status: paymentType === 'CASH' ? 'active' : 'pending_payment',
-  personalTrainer: personalTrainer || null,
-  paymentType,
-});
+		// Find current active membership
+		const activeMembership = await Membership.findOne({
+			memberId: id,
+			status: 'active',
+		}).sort({ endDate: -1 });
 
-// create invoice
-const invoice = await Invoice.create({
-  invoiceNumber: `INV-${Date.now()}`,
-  memberId: id,
-  membershipId: membership._id,
-  amount: plan.price,
-  paymentMethod: paymentType,
-  status: paymentType === 'CASH' ? 'PAID' : 'PENDING',
-});
+		let startDate = new Date();
+		let status = 'active';
 
-// 🔥 LINK INVOICE TO MEMBERSHIP
-membership.invoiceId = invoice._id;
-await membership.save();
+		if (activeMembership) {
+			// Schedule after current plan
+			startDate = new Date(activeMembership.endDate);
+			startDate.setDate(startDate.getDate() + 1);
+			status = 'scheduled';
+		}
 
-		// Create payment record
+		const endDate = new Date(startDate);
+		endDate.setMonth(endDate.getMonth() + plan.durationInMonths);
+
+		const membership = await Membership.create({
+			memberId: id,
+			planId,
+			startDate,
+			endDate,
+			status: paymentType === 'ONLINE' ? 'pending_payment' : status,
+			personalTrainer: personalTrainer || null,
+			paymentType,
+		});
+
+		const invoice = await Invoice.create({
+			invoiceNumber: `INV-${Date.now()}`,
+			memberId: id,
+			membershipId: membership._id,
+			amount: plan.price,
+			paymentMethod: paymentType,
+			status: paymentType === 'CASH' ? 'PAID' : 'PENDING',
+		});
+
+		membership.invoiceId = invoice._id;
+		await membership.save();
+
 		await Payment.create({
 			invoiceId: invoice._id,
 			memberId: id,
@@ -73,113 +75,94 @@ await membership.save();
 			paidAt: paymentType === 'CASH' ? new Date() : null,
 		});
 
-		return res.status(201).json({
+		res.status(201).json({
 			success: true,
-			message: 'Membership added successfully',
+			message: activeMembership
+				? 'Membership scheduled successfully'
+				: 'Membership activated successfully',
 			data: membership,
 		});
 	} catch (err) {
 		console.error(err);
-		return res.status(500).json({
+		res.status(500).json({
 			success: false,
 			message: 'Failed to add membership',
 		});
 	}
 };
-
 exports.getMemberMembership = async (req, res) => {
 	try {
-		let membership = await Membership.findOne({
+		const membership = await Membership.findOne({
 			memberId: req.params.id,
-			status: { $in: ['active', 'paused', 'pending_payment'] },
 		})
+			.sort({ startDate: -1 })
 			.populate('planId')
 			.populate('personalTrainer');
 
-		if (!membership) {
-			return res.json({ data: null });
-		}
-
-		// Expiry check
-		if (new Date(membership.endDate) < new Date()) {
-			membership.status = 'expired';
-			await membership.save();
-			return res.json({ data: null });
-		}
-
-		res.json({ data: membership });
+		res.json({
+			success: true,
+			data: membership || null,
+		});
 	} catch (err) {
+		console.error(err);
 		res.status(500).json({
 			success: false,
 			message: 'Failed to fetch membership',
 		});
 	}
 };
+
+exports.getMembershipHistory = async (req, res) => {
+	try {
+		const { id } = req.params;
+
+		const history = await Membership.find({ memberId: id })
+			.populate('planId')
+			.sort({ createdAt: -1 });
+
+		res.status(200).json({
+			success: true,
+			data: history,
+		});
+	} catch (error) {
+		console.error('Membership history error:', error);
+		res.status(500).json({
+			success: false,
+			message: 'Failed to fetch membership history',
+		});
+	}
+};
+
 exports.editMembership = async (req, res) => {
 	try {
-		const { id } = req.params; // memberId
-		const { status, personalTrainer, extendDays, planId, endDate } = req.body;
+		const { endDate, personalTrainer, status } = req.body;
 
 		const membership = await Membership.findOne({
-			memberId: id,
-			status: { $in: ['active', 'paused', 'pending_payment'] },
-		});
-		if (
-			membership.status === 'pending_payment' &&
-			membership.paymentType === 'ONLINE' &&
-			['paused', 'cancelled', 'active'].includes(status)
-		) {
-			return res.status(400).json({
-				success: false,
-				message: 'Cannot modify membership until payment is completed',
-			});
-		}
-
+			memberId: req.params.id,
+		}).sort({ startDate: -1 });
 		if (!membership) {
-			return res.status(404).json({
-				success: false,
-				message: 'Membership not found',
+			return res.status(404).json({ message: 'Membership not found' });
+		}
+
+		// prevent editing expired memberships
+		if (membership.status === 'expired') {
+			return res.status(400).json({
+				message: 'Cannot edit expired membership',
 			});
 		}
 
-		// Optional: change plan
-		if (planId) {
-			const plan = await MembershipPlan.findById(planId);
-			if (!plan) {
-				return res.status(404).json({
-					success: false,
-					message: 'Plan not found',
-				});
-			}
-			membership.planId = planId;
-		}
-
-		if (endDate) membership.endDate = endDate;
-		if (personalTrainer !== undefined) membership.personalTrainer = personalTrainer || null;
-
-		// Allow limited status updates
-		if (status && ['active', 'paused', 'cancelled'].includes(status)) {
-			membership.status = status;
-		}
-		// Update plan
-		if (planId) {
-			membership.planId = planId;
-		}
-
-		// Admin override end date
-		if (endDate) {
-			membership.endDate = new Date(endDate);
-		}
+		membership.endDate = endDate;
+		membership.personalTrainer = personalTrainer || null;
+		membership.status = status;
 
 		await membership.save();
 
 		res.json({
 			success: true,
-			message: 'Membership updated successfully',
 			data: membership,
 		});
 	} catch (err) {
-		console.error('EDIT MEMBERSHIP ERROR:', err);
+		console.error(err);
 		res.status(500).json({
 			success: false,
 			message: 'Failed to update membership',

@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../../services/api';
 
-
 const EditMembership = () => {
 	const { id } = useParams();
 	const navigate = useNavigate();
@@ -12,7 +11,6 @@ const EditMembership = () => {
 	const [membership, setMembership] = useState(null);
 
 	const [formData, setFormData] = useState({
-		planId: '',
 		endDate: '',
 		personalTrainer: '',
 		status: '',
@@ -66,23 +64,6 @@ const EditMembership = () => {
 
 					<div className="card-body">
 						<form onSubmit={handleSubmit}>
-							{/* PLAN */}
-							<div className="mb-3">
-								<label>Plan</label>
-								<select
-									name="planId"
-									className="form-select"
-									value={formData.planId}
-									onChange={handleChange}
-								>
-									{plans.map((p) => (
-										<option key={p._id} value={p._id}>
-											{p.name}
-										</option>
-									))}
-								</select>
-							</div>
-
 							{/* END DATE */}
 							<div className="mb-3">
 								<label>End Date</label>

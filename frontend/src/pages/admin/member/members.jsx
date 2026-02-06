@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../../../services/api';
-import AdminLayout from '../../../components/layout/AdminLayout';
+
 
 import MemberForm from '../../../components/member/memberForm';
 import MemberTable from '../../../components/member/memberTable';
@@ -40,7 +40,7 @@ const Member = () => {
 	}, [search, members]);
 
 	return (
-		<AdminLayout>
+		<>
 			<div className="container-fluid p-4">
 				{/* HEADER */}
 				<div className="d-flex justify-content-between align-items-center mb-4">
@@ -97,7 +97,7 @@ const Member = () => {
 					</div>
 				</div>
 			</div>
-		</AdminLayout>
+		</>
 	);
 };
 

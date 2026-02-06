@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../../services/api';
-import AdminLayout from '../../../components/layout/AdminLayout';
+
 
 const MemberDetails = () => {
 	const { id } = useParams();
@@ -46,7 +46,7 @@ const MemberDetails = () => {
 	if (!member) return <p>Loading...</p>;
 
 	return (
-		<AdminLayout>
+		<>
 			<div className="p-4">
 				<h2 className="mb-3">Member Details</h2>
 
@@ -201,7 +201,7 @@ const MemberDetails = () => {
 					</div>
 				</div>
 			</div>
-		</AdminLayout>
+		</>
 	);
 };
 export default MemberDetails;

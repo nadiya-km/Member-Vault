@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { getPlans } from '../../services/planService';
 import PlanForm from '../../components/plans/PlanForm';
 import PlanTable from '../../components/plans/PlanTable';
-import AdminLayout from '../../components/layout/AdminLayout';
+
 
 const MembershipPlans = () => {
 	const [plans, setPlans] = useState([]);
@@ -25,7 +25,7 @@ const MembershipPlans = () => {
 	}, []);
 
 	return (
-		<AdminLayout>
+	<>
 			<div className="p-4">
 				<div className="d-flex justify-content-between align-items-center mb-3">
 					<h4>Membership Plans</h4>
@@ -52,7 +52,7 @@ const MembershipPlans = () => {
 					)}
 				</div>
 			</div>
-		</AdminLayout>
+		</>
 	);
 };
 

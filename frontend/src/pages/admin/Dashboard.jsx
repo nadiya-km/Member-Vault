@@ -1,6 +1,6 @@
 import api from '../../services/api';
 import { useEffect, useState } from 'react';
-import AdminLayout from '../../components/layout/AdminLayout';
+
 
 const Dashboard = () => {
   const [admin, setAdmin] = useState(null);
@@ -21,7 +21,7 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <AdminLayout>
+<>
       {/* CSS INSIDE SAME FILE */}
       <style>{`
         .dashboard {
@@ -98,7 +98,7 @@ const Dashboard = () => {
     </div>
   </div>
 </div>
-    </AdminLayout>
+  </>
   );
 };
 

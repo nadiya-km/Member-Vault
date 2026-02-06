@@ -14,41 +14,54 @@ const Sidebar = () => {
 
   return (
     <>
-      {/* DESKTOP SIDEBAR */}
-      <aside id="sidebar">
+      {/* ===== DESKTOP SIDEBAR ===== */}
+      <aside className="sidebar">
         <div>
-          <h2 className="logo">Admin Panel</h2>
+          {/* HEADER */}
+          <div className="sidebar-header">
+            <div className="icon-wrap">
+              <i className="bi bi-credit-card-2-front-fill"></i>
+            </div>
+            <h5>Admin Panel</h5>
+            <small>Management</small>
+          </div>
 
+          {/* LINKS */}
           <div className="links">
-           <NavLink to="/dashboard" className={({ isActive }) =>
-  `nav-link ${isActive ? "active" : ""}`
-}>
-  <i className="bi bi-speedometer2 me-2"></i> Dashboard
-</NavLink>
+            <NavLink to="/admin/dashboard" className={({ isActive }) =>
+              `nav-link ${isActive ? "active" : ""}`
+            }>
+              <i className="bi bi-speedometer2"></i>
+              Dashboard
+            </NavLink>
 
-<NavLink to="/plans" className={({ isActive }) =>
-  `nav-link ${isActive ? "active" : ""}`
-}>
-  <i className="bi bi-box-seam me-2"></i> Plans
-</NavLink>
+            <NavLink to="/admin/plans" className={({ isActive }) =>
+              `nav-link ${isActive ? "active" : ""}`
+            }>
+              <i className="bi bi-box-seam"></i>
+              Plans
+            </NavLink>
 
-<NavLink to="/members" className={({ isActive }) =>
-  `nav-link ${isActive ? "active" : ""}`
-}>
-  <i className="bi bi-people me-2"></i> Members
-</NavLink>
+            <NavLink to="/admin/members" className={({ isActive }) =>
+              `nav-link ${isActive ? "active" : ""}`
+            }>
+              <i className="bi bi-people"></i>
+              Members
+            </NavLink>
 
-<NavLink to="/trainers" className={({ isActive }) =>
-  `nav-link ${isActive ? "active" : ""}`
-}>
-  <i className="bi bi-person-badge me-2"></i> Trainers
-</NavLink>
+            <NavLink to="/admin/trainers" className={({ isActive }) =>
+              `nav-link ${isActive ? "active" : ""}`
+            }>
+              <i className="bi bi-person-badge"></i>
+              Trainers
+            </NavLink>
 
-<NavLink to="/payments" className={({ isActive }) =>
-  `nav-link ${isActive ? "active" : ""}`
-}>
-  <i className="bi bi-credit-card me-2"></i> Payments
-</NavLink>
+            <NavLink to="/admin/payments" className={({ isActive }) =>
+              `nav-link ${isActive ? "active" : ""}`
+            }>
+              <i className="bi bi-credit-card"></i>
+              Payments
+            </NavLink>
           </div>
         </div>
 
@@ -57,55 +70,37 @@ const Sidebar = () => {
         </button>
       </aside>
 
-      {/* MOBILE BOTTOM NAV */}
-      <nav className="bottom-nav">
-        <NavLink to="/dashboard" className={({ isActive }) =>
-          `bottom-link ${isActive ? "active" : ""}`
-        }>
-         <span className="icon"><i className="bi bi-speedometer2"></i></span>
-          <span className="text">Dashboard</span>
-        </NavLink>
+      {/* ===== MOBILE BOTTOM NAV ===== */}
+    <nav className="bottom-nav">
+  {[
+    ["dashboard", "speedometer2", "Dashboard"],
+    ["plans", "box-seam", "Plans"],
+    ["members", "people", "Members"],
+    ["trainers", "person-badge", "Trainers"],
+    ["payments", "credit-card", "Payments"],
+  ].map(([path, icon, label]) => (
+    <NavLink
+      key={path}
+      to={`/admin/${path}`}   // ✅ FIX
+      className={({ isActive }) =>
+        `bottom-link ${isActive ? "active" : ""}`
+      }
+    >
+      <i className={`bi bi-${icon}`}></i>
+      <span>{label}</span>
+    </NavLink>
+  ))}
+</nav>
 
-        <NavLink to="/plans" className={({ isActive }) =>
-          `bottom-link ${isActive ? "active" : ""}`
-        }>
-          <span className="icon"><i className="bi bi-box-seam"></i></span>
-          <span className="text">Plans</span>
-        </NavLink>
-
-        <NavLink to="/members" className={({ isActive }) =>
-          `bottom-link ${isActive ? "active" : ""}`
-        }>
-        <span className="icon"><i className="bi bi-people"></i></span>
-          <span className="text">Members</span>
-        </NavLink>
-
-        <NavLink to="/trainers" className={({ isActive }) =>
-          `bottom-link ${isActive ? "active" : ""}`
-        }>
-          <span className="icon"><i className="bi bi-person-badge"></i></span>
-          <span className="text">Trainers</span>
-        </NavLink>
-
-        <NavLink to="/payments" className={({ isActive }) =>
-          `bottom-link ${isActive ? "active" : ""}`
-        }>
-          <span className="icon"><i className="bi bi-credit-card"></i></span>
-          <span className="text">Payments</span>
-        </NavLink>
-      </nav>
-
-      {/* LOGOUT MODAL */}
+      {/* ===== LOGOUT MODAL ===== */}
       {showLogoutModal && (
         <div className="modal-overlay">
           <div className="modal-content">
             <h3>Confirm Logout</h3>
             <p>Are you sure you want to logout?</p>
             <div className="modal-actions">
-              <button className="btn-cancel" onClick={() => setShowLogoutModal(false)}>
-                Cancel
-              </button>
-              <button className="btn-logout" onClick={handleLogout}>
+              <button onClick={() => setShowLogoutModal(false)}>Cancel</button>
+              <button className="danger" onClick={handleLogout}>
                 Logout
               </button>
             </div>

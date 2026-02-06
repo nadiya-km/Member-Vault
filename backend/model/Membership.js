@@ -33,6 +33,11 @@ const membershipSchema = new mongoose.Schema(
 			ref: 'PersonalTrainer',
 			default: null,
 		},
+		// model/Membership.js
+invoiceId: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: 'Invoice',
+},
 	},
 	{ timestamps: true }
 );

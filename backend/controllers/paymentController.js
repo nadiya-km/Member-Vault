@@ -2,6 +2,7 @@ const razorpay = require('../utils/razorpay');
 const Payment = require('../model/Payment');
 const crypto = require('crypto');
 const axios = require("axios");
+const Membership = require('../model/Membership');
 
 exports.createOrder = async (req, res) => {
   try {
@@ -27,22 +28,32 @@ exports.savePayment = async (req, res) => {
   try {
     const { invoiceId, amount, method, memberId } = req.body;
 
-    const payment = await Payment.create({
-      invoiceId,
-      memberId,
-      gateway: 'OFFLINE',  
-      method: 'CASH',       
-      amount,
-      status: 'SUCCESS',
-      transactionId: 'CASH-' + Date.now(),
-      paidAt: new Date()
-    });
+   const payment = await Payment.create({
+  invoiceId,
+  memberId,
+  paymentType: 'CASH',   // ✅ ADD THIS
+  gateway: 'OFFLINE',
+  method: 'CASH',
+  amount,
+  status: 'SUCCESS',
+  transactionId: 'CASH-' + Date.now(),
+  paidAt: new Date()
+});
+    await Membership.findOneAndUpdate(
+  { invoiceId },
+  {
+    status: 'active',
+    paidAt: new Date(),
+    amountPaid: amount,
+  }
+);
 
     res.json({ success: true, payment });
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: 'Payment save failed' });
   }
+
 };exports.verifyAndSavePayment = async (req, res) => {
   try {
     const {
@@ -69,21 +80,32 @@ exports.savePayment = async (req, res) => {
       });
     }
 
-    const payment = await Payment.create({
-      invoiceId,
-      memberId,
-      gateway: "RAZORPAY",
-      method, // UPI / CARD / NET_BANKING
-      amount,
-      status: "SUCCESS",
-      transactionId: razorpay_payment_id,
-      orderId: razorpay_order_id,
-      paidAt: new Date(),
-    });
+    // Save payment
+   const payment = await Payment.create({
+  invoiceId,
+  memberId,
+  paymentType: 'ONLINE', // ✅ ADD THIS
+  gateway: "RAZORPAY",
+  method,
+  amount,
+  status: "SUCCESS",
+  transactionId: razorpay_payment_id,
+  orderId: razorpay_order_id,
+  paidAt: new Date(),
+});
+    // 🔥 ACTIVATE MEMBERSHIP
+    await Membership.findOneAndUpdate(
+      { invoiceId },
+      {
+        status: 'active',
+        paidAt: new Date(),
+        amountPaid: amount,
+      }
+    );
 
     return res.json({
       success: true,
-      message: "Payment verified successfully",
+      message: "Payment completed. Membership activated 🎉",
       payment,
     });
   } catch (err) {

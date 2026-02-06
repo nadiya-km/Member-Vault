@@ -16,24 +16,13 @@ const PaymentPage = () => {
 	const [modalMessage, setModalMessage] = useState('');
 
 	useEffect(() => {
-		if (!invoiceId) {
-			navigate('/dashboard');
-			return;
-		}
-
-		setInvoice({
-			_id: '65c1b9a2f1d4a6b123456789',
-			amount: 500,
-			invoiceNumber: 'INV-001',
-		});
-
-		setMember({
-			_id: '65c1b9a2f1d4a6b987654321',
-			name: 'Test User',
-			email: 'test@mail.com',
-			phone: '9999999999',
-		});
-	}, [invoiceId, navigate]);
+  const fetchInvoice = async () => {
+    const res = await api.get(`/invoices/${invoiceId}`)
+    setInvoice(res.data.invoice);
+    setMember(res.data.member);
+  };
+  fetchInvoice();
+}, [invoiceId]);
 
 	// MAIN HANDLER
 	const openPayment = () => {
@@ -42,7 +31,7 @@ const PaymentPage = () => {
 	};
 	const handleModalOk = () => {
 		setShowModal(false);
-		navigate('/dashboard');
+		navigate(`/member/profile/${member.secretKey}`);
 	};
 
 	// 🔴 RAZORPAY
@@ -119,60 +108,94 @@ const PaymentPage = () => {
 		}
 	};
 
-	if (!invoice) return <h3>Loading...</h3>;
+	if (!invoice) return <h3 className="text-center mt-5">Loading...</h3>;
 
-	return (
-		<div>
-			<h2>Invoice: {invoice.invoiceNumber}</h2>
-			<h3>Amount: ₹{invoice.amount}</h3>
+return (
+  <div className="container d-flex justify-content-center align-items-center mt-5">
+    <div className="card shadow-lg" style={{ maxWidth: '480px', width: '100%' }}>
+      
+      {/* HEADER */}
+      <div className="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <span>💳 Payment</span>
+        <button
+          className="btn btn-sm btn-light"
+          onClick={() => navigate(-1)}
+        >
+          ⬅ Back
+        </button>
+      </div>
 
-			<h4>Select Payment Method</h4>
+      {/* BODY */}
+      <div className="card-body">
+        <h5 className="mb-3">
+          Invoice: <span className="text-muted">{invoice.invoiceNumber}</span>
+        </h5>
 
-			<label>
-				<input
-					type="radio"
-					checked={paymentMethod === 'RAZORPAY'}
-					onChange={() => setPaymentMethod('RAZORPAY')}
-				/>
-				Razorpay
-			</label>
+        <h3 className="text-success mb-4">
+          ₹ {invoice.amount}
+        </h3>
 
-			<br />
-			<br />
+        <div className="mb-3">
+          <label className="form-label fw-bold">
+            Select Payment Method
+          </label>
 
-			<label>
-				<input
-					type="radio"
-					checked={paymentMethod === 'CASH'}
-					onChange={() => setPaymentMethod('CASH')}
-				/>
-				Cash
-			</label>
+          <div className="form-check mb-2">
+            <input
+              className="form-check-input"
+              type="radio"
+              checked={paymentMethod === 'RAZORPAY'}
+              onChange={() => setPaymentMethod('RAZORPAY')}
+            />
+            <label className="form-check-label">
+              Razorpay (UPI / Card / Netbanking)
+            </label>
+          </div>
 
-			<br />
-			<br />
+          {/* <div className="form-check">
+            <input
+              className="form-check-input"
+              type="radio"
+              checked={paymentMethod === 'CASH'}
+              onChange={() => setPaymentMethod('CASH')}
+            />
+            <label className="form-check-label">
+              Cash
+            </label>
+          </div> */}
+        </div>
 
-			<button onClick={openPayment}>Pay Now</button>
+        <button
+          className="btn btn-primary w-100 btn-lg mt-3"
+          onClick={openPayment}
+        >
+          Pay Now
+        </button>
+      </div>
+    </div>
 
-			{showModal && (
-				<div style={styles.overlay}>
-					<div style={styles.modal}>
-						<div style={styles.icon}>{modalType === 'success' ? '✅' : '❌'}</div>
+    {/* MODAL */}
+    {showModal && (
+      <div style={styles.overlay}>
+        <div style={styles.modal}>
+          <div style={styles.icon}>
+            {modalType === 'success' ? '✅' : '❌'}
+          </div>
 
-						<h3 style={{ color: modalType === 'success' ? '#16a34a' : '#dc2626' }}>
-							{modalType === 'success' ? 'Payment Successful' : 'Payment Failed'}
-						</h3>
+          <h4 style={{ color: modalType === 'success' ? '#16a34a' : '#dc2626' }}>
+            {modalType === 'success' ? 'Payment Successful' : 'Payment Failed'}
+          </h4>
 
-						<p style={styles.message}>{modalMessage}</p>
+          <p style={styles.message}>{modalMessage}</p>
 
-						<button style={styles.okBtn} onClick={handleModalOk}>
-							OK
-						</button>
-					</div>
-				</div>
-			)}
-		</div>
-	);
+          <button style={styles.okBtn} onClick={handleModalOk}>
+            OK
+          </button>
+        </div>
+      </div>
+    )}
+  </div>
+);
 };
 const styles = {
 	overlay: {

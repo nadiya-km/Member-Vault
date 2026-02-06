@@ -10,5 +10,5 @@ const {
 
 router.post('/:id/membership', auth, addMembership);
 router.get('/:id/membership', auth, getMemberMembership);
-router.put('/members/:id/membership', auth, editMembership);
+router.put('/:id/membership', auth, editMembership);
 module.exports = router;

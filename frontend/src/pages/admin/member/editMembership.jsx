@@ -49,6 +49,7 @@ const EditMembership = () => {
 		e.preventDefault();
 
 		await api.put(`/members/${id}/membership`, formData);
+
 		alert('Membership updated');
 		navigate(`/admin/members/${id}`);
 	};

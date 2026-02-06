@@ -3,15 +3,12 @@ const MembershipPlan = require('../model/MembershipPlan');
 const Invoice = require('../model/Invoice');
 const Payment = require('../model/Payment');
 
-// ===============================
-// ADD MEMBERSHIP
-// ===============================
 exports.addMembership = async (req, res) => {
 	try {
 		const { id } = req.params;
 		const { planId, startDate, endDate, personalTrainer, paymentType } = req.body;
 
-		// 1️⃣ Check existing active membership
+		// Check existing active membership
 		const existing = await Membership.findOne({
 			memberId: id,
 			status: 'active',
@@ -23,8 +20,14 @@ exports.addMembership = async (req, res) => {
 				message: 'Active membership already exists',
 			});
 		}
+		if (!['CASH', 'ONLINE'].includes(paymentType)) {
+			return res.status(400).json({
+				success: false,
+				message: 'Invalid payment type',
+			});
+		}
 
-		// 2️⃣ Get membership plan
+		// Get membership plan
 		const plan = await MembershipPlan.findById(planId);
 		if (!plan) {
 			return res.status(404).json({
@@ -33,7 +36,7 @@ exports.addMembership = async (req, res) => {
 			});
 		}
 
-		// 3️⃣ Create membership
+		//  Create membership
 		const membership = await Membership.create({
 			memberId: id,
 			planId,
@@ -44,7 +47,7 @@ exports.addMembership = async (req, res) => {
 			paymentType,
 		});
 
-		// 4️⃣ Create invoice
+		//  Create invoice
 		const invoice = await Invoice.create({
 			invoiceNumber: `INV-${Date.now()}`,
 			memberId: id,
@@ -54,12 +57,13 @@ exports.addMembership = async (req, res) => {
 			status: paymentType === 'CASH' ? 'PAID' : 'PENDING',
 		});
 
-		// 5️⃣ Create payment record
+		// Create payment record
 		await Payment.create({
 			invoiceId: invoice._id,
 			memberId: id,
 			gateway: paymentType === 'CASH' ? 'OFFLINE' : 'RAZORPAY',
 			method: paymentType === 'CASH' ? 'CASH' : 'UPI',
+			paymentType,
 			amount: plan.price,
 			status: paymentType === 'CASH' ? 'SUCCESS' : 'PENDING',
 			paidAt: paymentType === 'CASH' ? new Date() : null,
@@ -79,14 +83,11 @@ exports.addMembership = async (req, res) => {
 	}
 };
 
-// ===============================
-// GET ACTIVE MEMBERSHIP
-// ===============================
 exports.getMemberMembership = async (req, res) => {
 	try {
 		let membership = await Membership.findOne({
 			memberId: req.params.id,
-			status: 'active',
+			status: { $in: ['active', 'paused', 'pending_payment'] },
 		})
 			.populate('planId')
 			.populate('personalTrainer');

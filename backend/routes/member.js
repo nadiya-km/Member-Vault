@@ -8,12 +8,13 @@ const {
 	getMemberDetails,
 	getDashboard,
 	getProfileBySecretKey,
+    regenerateProfileLink,
 } = require('../controllers/memberController');
 router.get('/profile/:secretKey', getProfileBySecretKey);
 router.get('/dashboard', auth, getDashboard);
 router.post('/', auth, createMember);
 router.get('/', auth, getMembers);
-
+router.post('/:id/regenerate-link', auth, regenerateProfileLink);
 router.get('/:id', auth, getMemberDetails);
 
 module.exports = router;

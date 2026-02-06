@@ -72,6 +72,23 @@ exports.getProfileBySecretKey = async (req, res) => {
 	res.json({ success: true, data: { member, membership } });
 };
 
+exports.regenerateProfileLink = async (req, res) => {
+	const member = await Member.findById(req.params.id).select('+secretKey');
+
+	if (!member) {
+		return res.status(404).json({ message: 'Member not found' });
+	}
+
+	member.regenerateSecretKey();
+	await member.save();
+
+	const profileLink = `http://localhost:5173/member/profile/${member.secretKey}`;
+
+	res.json({
+		success: true,
+		profileLink,
+	});
+};
 exports.getDashboard = async (req, res) => {
 	try {
 		const totalMembers = await Member.countDocuments({

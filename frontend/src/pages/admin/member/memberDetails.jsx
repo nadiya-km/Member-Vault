@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../../services/api';
 
-
 const MemberDetails = () => {
 	const { id } = useParams();
 	const navigate = useNavigate();
@@ -21,7 +20,6 @@ const MemberDetails = () => {
 			});
 			setMember(res.data.data.member);
 			setProfileLink(res.data.data.profileLink);
-
 		};
 
 		const fetchMembership = async () => {
@@ -156,14 +154,44 @@ const MemberDetails = () => {
 						<strong>Member Profile Link</strong>
 					</div>
 					<div className="card-body">
-						<input type="text" className="form-control mb-2" value={profileLink || ''} readOnly />
-						<button
-							className="btn btn-outline-primary"
-							disabled={!profileLink}
-							onClick={() => navigator.clipboard.writeText(profileLink)}
-						>
-							Copy Link
-						</button>
+						<div className="d-flex flex-column gap-2">
+							<input type="text" className="form-control" value={profileLink || ''} readOnly />
+
+							<div className="d-flex gap-2">
+								<button
+									className="btn btn-outline-primary"
+									disabled={!profileLink}
+									onClick={async () => {
+										try {
+											await navigator.clipboard.writeText(profileLink);
+											alert('Profile link copied!');
+										} catch (err) {
+											alert('Failed to copy link');
+										}
+									}}
+								>
+									Copy Link
+								</button>
+
+								<button
+									className="btn btn-outline-danger"
+									disabled={!id}
+									onClick={async () => {
+										if (!window.confirm('This will invalidate the old link. Continue?')) return;
+
+										try {
+											const res = await api.post(`/members/${id}/regenerate-link`);
+											setProfileLink(res.data.profileLink);
+											alert('New profile link generated');
+										} catch (err) {
+											alert('Failed to regenerate link');
+										}
+									}}
+								>
+									Regenerate Link
+								</button>
+							</div>
+						</div>
 					</div>
 				</div>
 

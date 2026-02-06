@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import api from '../../services/api';
-import AdminLayout from '../../components/layout/AdminLayout';
+
 
 const CreateMembershipPlan = () => {
 	const [form, setForm] = useState({
@@ -32,7 +32,7 @@ const CreateMembershipPlan = () => {
 	};
 
 	return (
-		<AdminLayout>
+		<>
 			<div className="p-4">
 				<div className="card p-4">
 					<h4>Create Membership Plan</h4>
@@ -86,7 +86,7 @@ const CreateMembershipPlan = () => {
 					</button>
 				</div>
 			</div>
-		</AdminLayout>
+		</>
 	);
 };
 

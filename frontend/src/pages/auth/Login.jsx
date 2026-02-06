@@ -17,7 +17,7 @@ const Login = () => {
 			if (res.data.success) {
 				secureLocalStorage.setItem('accessToken', res.data.accessToken);
 				secureLocalStorage.setItem('refreshToken', res.data.refreshToken);
-				navigate('/dashboard', { replace: true });
+				navigate('/admin/dashboard', { replace: true });
 			}
 		} catch (err) {
 			alert('Invalid credentials');

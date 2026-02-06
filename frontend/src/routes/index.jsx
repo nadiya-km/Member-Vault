@@ -11,12 +11,16 @@ import MembershipPlans from '../pages/admin/MembershipPlans';
 import Member from '../pages/admin/member/members';
 import MemberDetails from '../pages/admin/member/MemberDetails';
 import AddMembership from '../pages/admin/member/addMembership';
+import EditMembership from '../pages/admin/member/editMembership';
+import MemberProfile from '../pages/member/profile';
 
 const AppRoutes = () => {
 	const location = useLocation();
 
 	// Hide navbar on login page
-	const hideSidebar = location.pathname === '/login';
+const hideSidebar =
+	location.pathname === '/login' || location.pathname.startsWith('/member/profile');
+
 
 	return (
 		<>
@@ -80,7 +84,8 @@ const AppRoutes = () => {
 						</ProtectedRoute>
 					}
 				/>
-
+				<Route path="/admin/members/:id/edit-membership" element={<EditMembership />} />
+				<Route path="/member/profile/:secretKey" element={<MemberProfile />} />
 				<Route
 					path="/admin/members/:id/add-membership"
 					element={

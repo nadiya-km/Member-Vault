@@ -26,7 +26,7 @@ exports.getMembers = async (req, res) => {
 };
 
 exports.getMemberDetails = async (req, res) => {
-	const member = await Member.findById(req.params.id);
+	const member = await Member.findById(req.params.id).select('+secretKey');
 	if (!member) return res.status(404).json({ message: 'Not found' });
 
 	const membership = await Membership.findOne({
@@ -35,25 +35,37 @@ exports.getMemberDetails = async (req, res) => {
 	})
 		.populate('planId')
 		.populate('personalTrainer');
+	const profileLink = `http://localhost:5173/member/profile/${member.secretKey}`;
 
-	res.json({ data: { member, membership } });
+	res.json({ data: { member, membership, profileLink } });
+};
+exports.getProfileBySecretKey = async (req, res) => {
+	const member = await Member.findOne({
+		secretKey: req.params.secretKey,
+		status: 'active',
+	});
+
+	const membership = await Membership.findOne({
+		memberId: member._id,
+		status: { $in: ['active', 'paused', 'pending_payment'] },
+	})
+		.populate('planId')
+		.populate('personalTrainer');
+
+	res.json({ success: true, data: { member, membership } });
 };
 
-
-
-
-
 exports.getDashboard = async (req, res) => {
-  try {
-    const totalMembers = await Member.countDocuments({
-      status: 'active',
-    });
+	try {
+		const totalMembers = await Member.countDocuments({
+			status: 'active',
+		});
 
-    res.json({
-      admin: req.admin, 
-      totalMembers,
-    });
-  } catch (error) {
-    res.status(500).json({ message: 'Dashboard error' });
-  }
+		res.json({
+			admin: req.admin,
+			totalMembers,
+		});
+	} catch (error) {
+		res.status(500).json({ message: 'Dashboard error' });
+	}
 };

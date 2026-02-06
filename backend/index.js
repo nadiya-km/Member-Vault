@@ -31,7 +31,7 @@ const memberRoutes = require('./routes/member');
 app.use('/api/members', memberRoutes);
 
 const membershipRoutes = require('./routes/membership');
-app.use('/api', membershipRoutes);
+app.use('/api/members', membershipRoutes);
 
 const membershipPlanRoutes = require('./routes/Plan');
 app.use('/api/membership-plans', membershipPlanRoutes);

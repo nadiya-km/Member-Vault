@@ -34,7 +34,6 @@ const MemberProfile = () => {
 	}
 
 	const { member, membership } = data;
-
 	const isPaymentDue = membership && membership.status === 'pending_payment';
 
 	return (
@@ -76,7 +75,7 @@ const MemberProfile = () => {
 									className={`badge px-3 py-2 ${
 										membership.status === 'active' ? 'bg-success' : 'bg-warning text-dark'
 									}`}
-							 	>
+								>
 									{membership.status.replace('_', ' ').toUpperCase()}
 								</span>
 							)}
@@ -143,7 +142,6 @@ const MemberProfile = () => {
 			</div>
 		</div>
 	);
-
 };
 
 export default MemberProfile;

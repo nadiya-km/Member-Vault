@@ -25,7 +25,7 @@ const membershipSchema = new mongoose.Schema(
 		cancelledAt: Date,
 		status: {
 			type: String,
-			enum: ['active', 'expired'],
+			enum: ['active', 'pending_payment', 'paused', 'expired', , 'cancelled'],
 			default: 'active',
 		},
 		personalTrainer: {

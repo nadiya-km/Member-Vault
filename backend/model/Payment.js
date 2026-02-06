@@ -34,7 +34,11 @@ const paymentSchema = new mongoose.Schema(
 			type: Number,
 			required: true,
 		},
-
+		paymentType: {
+			type: String,
+			enum: ['CASH', 'ONLINE'],
+			required: true,
+		},
 		status: {
 			type: String,
 			enum: ['SUCCESS', 'FAILED', 'PENDING'],

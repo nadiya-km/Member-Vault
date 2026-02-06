@@ -1,3 +1,4 @@
+// components/layout/AdminLayout.jsx
 import Sidebar from "../../components/sidebar/Sidebar";
 import { Outlet } from "react-router-dom";
 import Breadcrumb from "../Breadcrumb";
@@ -14,9 +15,7 @@ const AdminLayout = () => {
           padding: "24px",
         }}
       >
-        {/* ✅ Breadcrumb here */}
         <Breadcrumb />
-
         <Outlet />
       </div>
     </>

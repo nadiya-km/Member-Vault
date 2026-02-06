@@ -1,6 +1,7 @@
 // controllers/memberController.js
 const Member = require('../model/Member');
 const Membership = require('../model/Membership');
+const { sendEmail } = require('../utils/sendEmail');
 
 exports.createMember = async (req, res) => {
 	const { name, email, phone, whatsappNumber, age } = req.body;
@@ -15,6 +16,22 @@ exports.createMember = async (req, res) => {
 		phone,
 		whatsappNumber,
 		age,
+	});
+	const profileLink = `http://localhost:5173/member/profile/${member.secretKey}`;
+
+	await sendEmail({
+		to: member.email,
+		subject: 'Welcome to Our Gym – Your Profile Access',
+		html: `
+    <h3>Hi ${member.name} 👋</h3>
+    <p>Welcome to our gym!</p>
+	<p>Your personal gym profile is ready.</p>
+    <p>You can view your profile, membership details, and payments using the link below:</p>
+    <a href="${profileLink}" target="_blank">${profileLink}</a>
+    <br/><br/>
+    <p><strong>Keep this link private.</strong></p>
+    <p>– Gym Team </p>
+  `,
 	});
 
 	res.status(201).json({ data: member });

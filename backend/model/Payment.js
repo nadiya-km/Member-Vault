@@ -14,11 +14,11 @@ const paymentSchema = new mongoose.Schema(
 			required: true,
 		},
 
-		gateway: {
-			type: String,
-			enum: ['RAZORPAY', 'PHONEPE', 'STRIPE', 'OFFLINE'],
-			required: true,
-		},
+	 gateway: {
+  type: String,
+  enum: ['RAZORPAY', 'CASHFREE', 'PHONEPE', 'STRIPE', 'OFFLINE'],
+  required: true,
+},
 
 		method: {
 			type: String,

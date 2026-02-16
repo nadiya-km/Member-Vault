@@ -103,3 +103,34 @@ exports.getDashboard = async (req, res) => {
 		res.status(500).json({ message: 'Dashboard error' });
 	}
 };
+
+
+exports.updateMember = async (req, res) => {
+	try {
+		const { name, email, phone, whatsappNumber, age, status } = req.body;
+
+		const member = await Member.findById(req.params.id);
+		if (!member) {
+			return res.status(404).json({ message: 'Member not found' });
+		}
+
+		// Update fields (only if provided)
+		if (name) member.name = name;
+		if (email) member.email = email;
+		if (phone) member.phone = phone;
+		if (whatsappNumber) member.whatsappNumber = whatsappNumber;
+		if (age !== undefined) member.age = age;
+		if (status) member.status = status;
+
+		await member.save();
+
+		res.json({
+			success: true,
+			message: 'Member updated successfully',
+			data: member,
+		});
+	} catch (err) {
+		console.error(err);
+		res.status(500).json({ message: 'Failed to update member' });
+	}
+};

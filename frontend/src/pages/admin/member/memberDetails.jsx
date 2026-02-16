@@ -13,22 +13,18 @@ const MemberDetails = () => {
 
 	useEffect(() => {
 		const fetchMember = async () => {
-			const res = await api.get(`/members/${id}`, {
-				headers: {
-					Authorization: `Bearer ${localStorage.getItem('token')}`,
-				},
-			});
-			setMember(res.data.data.member);
-			setProfileLink(res.data.data.profileLink);
+			try {
+				const res = await api.get(`/members/${id}`);
+				setMember(res.data.data.member);
+				setProfileLink(res.data.data.profileLink);
+			} catch (err) {
+				console.error('Failed to fetch member', err);
+			}
 		};
 
 		const fetchMembership = async () => {
 			try {
-				const res = await api.get(`/members/${id}/membership`, {
-					headers: {
-						Authorization: `Bearer ${localStorage.getItem('token')}`,
-					},
-				});
+				const res = await api.get(`/members/${id}/membership`);
 				setMembership(res.data.data);
 			} catch {
 				setMembership(null);
@@ -41,195 +37,212 @@ const MemberDetails = () => {
 		fetchMembership();
 	}, [id]);
 
-	if (!member) return <p>Loading...</p>;
+	if (!member) return <p className="p-4">Loading member...</p>;
 
 	return (
-		<>
-			<div className="p-4">
-				<h2 className="mb-3">Member Details</h2>
+		<div className="p-4">
+			<h2 className="mb-4">Member Details</h2>
 
-				{/* MEMBER INFO */}
-				<table className="table table-bordered">
-					<tbody>
-						<tr>
-							<th>Name</th>
-							<td>{member.name}</td>
-						</tr>
-						<tr>
-							<th>Email</th>
-							<td>{member.email}</td>
-						</tr>
-						<tr>
-							<th>Phone</th>
-							<td>{member.phone}</td>
-						</tr>
-						<tr>
-							<th>WhatsApp</th>
-							<td>{member.whatsappNumber}</td>
-						</tr>
-						<tr>
-							<th>Age</th>
-							<td>{member.age}</td>
-						</tr>
-					</tbody>
-				</table>
-
-				{/* MEMBERSHIP SECTION */}
-				<div className="card mt-4">
-					<div className="card-header bg-success text-white">
-						<h5 className="mb-0">Membership</h5>
+			{/* MEMBER INFO */}
+			<div className="card mb-4">
+				<div className="card-header">
+					<h5 className="mb-0">Member Info</h5>
+				</div>
+				<div className="card-body row g-3">
+					<div className="col-md-4">
+						<strong>Name:</strong> {member.name}
 					</div>
-
-					<div className="card-body">
-						{loadingMembership ? (
-							<p>Loading membership...</p>
-						) : !membership ? (
-							<>
-								<p className="text-muted mb-3">No active membership</p>
-								<button
-									className="btn btn-primary"
-									onClick={() => navigate(`/admin/members/${id}/add-membership`)}
-								>
-									Add Membership
-								</button>
-							</>
-						) : (
-							<table className="table table-bordered">
-								<tbody>
-									<tr>
-										<th>Plan</th>
-										<td>{membership.planId.name}</td>
-									</tr>
-									<tr>
-										<th>Price</th>
-										<td>₹{membership.planId.price}</td>
-									</tr>
-									<tr>
-										<th>Duration</th>
-										<td>{membership.planId.durationInMonths} month(s)</td>
-									</tr>
-									<tr>
-										<th>Start Date</th>
-										<td>{new Date(membership.startDate).toDateString()}</td>
-									</tr>
-									<tr>
-										<th>End Date</th>
-										<td>{new Date(membership.endDate).toDateString()}</td>
-									</tr>
-									<tr>
-										<th>Status</th>
-										<td>
-											{membership.status === 'active' && (
-												<span className="badge bg-success">Active</span>
-											)}
-
-											{membership.status === 'paused' && (
-												<span className="badge bg-secondary">Paused</span>
-											)}
-
-											{membership.status === 'pending_payment' && (
-												<span className="badge bg-warning text-dark">Pending Payment</span>
-											)}
-
-											{membership.status === 'cancelled' && (
-												<span className="badge bg-danger">Cancelled</span>
-											)}
-										</td>
-									</tr>
-
-									{membership.personalTrainer && (
-										<tr>
-											<th>Trainer</th>
-											<td>{membership.personalTrainer.name}</td>
-										</tr>
-									)}
-								</tbody>
-							</table>
-						)}
+					<div className="col-md-4">
+						<strong>Email:</strong> {member.email}
+					</div>
+					<div className="col-md-4">
+						<strong>Phone:</strong> {member.phone}
+					</div>
+					<div className="col-md-4">
+						<strong>WhatsApp:</strong> {member.whatsappNumber}
+					</div>
+					<div className="col-md-4">
+						<strong>Age:</strong> {member.age}
 					</div>
 				</div>
-				{/* PROFILE LINK – always visible */}
-				<div className="card mt-3">
-					<div className="card-header">
-						<strong>Member Profile Link</strong>
-					</div>
-					<div className="card-body">
-						<div className="d-flex flex-column gap-2">
-							<input type="text" className="form-control" value={profileLink || ''} readOnly />
+			</div>
 
-							<div className="d-flex gap-2">
-								<button
-									className="btn btn-outline-primary"
-									disabled={!profileLink}
-									onClick={async () => {
-										try {
-											await navigator.clipboard.writeText(profileLink);
-											alert('Profile link copied!');
-										} catch (err) {
-											alert('Failed to copy link');
-										}
-									}}
-								>
-									Copy Link
-								</button>
+			{/* CURRENT MEMBERSHIP */}
+			<div className="card mb-4">
+				<div className="card-header bg-success text-white d-flex justify-content-between align-items-center">
+					<h5 className="mb-0">Current Membership</h5>
+					{membership && (
+						<span
+							className={`badge ${
+								membership.status === 'active'
+									? 'bg-light text-success'
+									: membership.status === 'pending_payment'
+										? 'bg-warning text-dark'
+										: 'bg-secondary'
+							}`}
+						>
+							{membership.status.replace('_', ' ').toUpperCase()}
+						</span>
+					)}
+				</div>
 
-								<button
-									className="btn btn-outline-danger"
-									disabled={!id}
-									onClick={async () => {
-										if (!window.confirm('This will invalidate the old link. Continue?')) return;
-
-										try {
-											const res = await api.post(`/members/${id}/regenerate-link`);
-											setProfileLink(res.data.profileLink);
-											alert('New profile link generated');
-										} catch (err) {
-											alert('Failed to regenerate link');
-										}
-									}}
-								>
-									Regenerate Link
-								</button>
-							</div>
+				<div className="card-body">
+					{loadingMembership ? (
+						<p>Loading membership...</p>
+					) : !membership ? (
+						/* NO MEMBERSHIP AT ALL */
+						<div className="text-center">
+							<p className="text-muted">No membership found</p>
+							<button
+								className="btn btn-primary"
+								onClick={() => navigate(`/admin/members/${id}/add-membership`)}
+							>
+								Add Membership
+							</button>
 						</div>
-					</div>
+					) : membership.status === 'cancelled' || membership.status === 'expired' ? (
+						/* CANCELLED / EXPIRED */
+						<div className="text-center">
+							<p className="fw-semibold text-danger">
+								Last membership was {membership.status.toUpperCase()}
+							</p>
+
+							{membership.status === 'cancelled' && (
+								<p className="text-secondary mb-3">
+									<strong>Cancelled On:</strong> {new Date(membership.updatedAt).toDateString()}
+								</p>
+							)}
+
+							<button
+								className="btn btn-primary"
+								onClick={() => navigate(`/admin/members/${id}/add-membership`)}
+							>
+								Add New Membership
+							</button>
+						</div>
+					) : (
+						/* ACTIVE / PENDING / SCHEDULED */
+						<div className="row g-3">
+							<div className="col-md-4">
+								<strong>Plan:</strong> {membership.planId.name}
+							</div>
+
+							<div className="col-md-4">
+								<strong>Price:</strong> ₹{membership.planId.price}
+							</div>
+
+							<div className="col-md-4">
+								<strong>Duration:</strong> {membership.planId.durationInMonths} months
+							</div>
+
+							<div className="col-md-4">
+								<strong>Start:</strong> {new Date(membership.startDate).toDateString()}
+							</div>
+
+							<div className="col-md-4">
+								<strong>End:</strong> {new Date(membership.endDate).toDateString()}
+							</div>
+
+							<div className="col-md-4">
+								<strong>Status:</strong>{' '}
+								<span
+									className={`badge ${
+										membership.status === 'active'
+											? 'bg-success'
+											: membership.status === 'pending_payment'
+												? 'bg-warning text-dark'
+												: 'bg-info'
+									}`}
+								>
+									{membership.status.replace('_', ' ').toUpperCase()}
+								</span>
+							</div>
+
+							{membership.personalTrainer && (
+								<div className="col-md-4">
+									<strong>Trainer:</strong> {membership.personalTrainer.name}
+								</div>
+							)}
+						</div>
+					)}
 				</div>
+			</div>
 
-				{/* ACTION BUTTONS */}
-				<div className="row g-2 mt-4">
-					<div className="col-md-4 col-12">
+			{/* PROFILE LINK */}
+			<div className="card mb-4">
+				<div className="card-header">
+					<strong>Member Profile Link</strong>
+				</div>
+				<div className="card-body">
+					<input className="form-control mb-2" value={profileLink || ''} readOnly />
+					<div className="d-flex gap-2">
 						<button
-							className="btn btn-secondary w-100"
-							onClick={() =>
-								membership
-									? navigate(`/admin/members/${id}/edit-membership`)
-									: navigate(`/admin/members/${id}/add-membership`)
-							}
+							className="btn btn-outline-primary"
+							disabled={!profileLink}
+							onClick={() => navigator.clipboard.writeText(profileLink)}
 						>
-							{membership ? 'Edit Membership' : 'Add Membership'}
+							Copy
 						</button>
-					</div>
-
-					<div className="col-md-4 col-12">
 						<button
-							className="btn btn-primary w-100"
-							onClick={() => navigate(`/admin/members/${id}/update-trainer`)}
+							className="btn btn-outline-danger"
+							onClick={async () => {
+								if (!window.confirm('Regenerate profile link?')) return;
+								const res = await api.post(`/members/${id}/regenerate-link`);
+								setProfileLink(res.data.profileLink);
+							}}
 						>
-							Update Trainer
-						</button>
-					</div>
-
-					<div className="col-md-4 col-12">
-						<button
-							className="btn btn-warning w-100"
-							onClick={() => navigate(`/admin/members/${id}/edit`)}
-						>
-							Edit Member
+							Regenerate
 						</button>
 					</div>
 				</div>
 			</div>
-		</>
+
+			{/* ACTION BUTTONS */}
+			<div className="row g-2">
+				<div className="col-md-3 col-12">
+					<button
+						className="btn btn-secondary w-100"
+						onClick={() =>
+							navigate(
+								membership
+									? `/admin/members/${id}/edit-membership`
+									: `/admin/members/${id}/add-membership`
+							)
+						}
+					>
+						{membership ? 'Edit Membership' : 'Add Membership'}
+					</button>
+				</div>
+
+				<div className="col-md-3 col-12">
+					<button
+						className="btn btn-primary w-100"
+						onClick={() => navigate(`/admin/members/${id}/add-membership`)}
+					>
+						Add Next Membership
+					</button>
+				</div>
+
+				<div className="col-md-3 col-12">
+					<button
+						className="btn btn-dark w-100"
+						onClick={() => navigate(`/admin/members/${id}/membership-history`)}
+					>
+						Membership History
+					</button>
+				</div>
+
+				<div className="col-md-3 col-12">
+					<button
+						className="btn btn-warning w-100"
+						onClick={() => navigate(`/admin/members/${id}/edit`)}
+					>
+						Edit Member
+					</button>
+				</div>
+			</div>
+		</div>
 	);
 };
+
 export default MemberDetails;

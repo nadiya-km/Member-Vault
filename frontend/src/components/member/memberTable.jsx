@@ -35,9 +35,8 @@ const MemberTable = ({ members }) => {
 								</div>
 							</td>
 							<td>
-								<span className={`badge px-3 rounded-pill ${m.status === 'active' ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning'
-									}`}>
-									{m.status.toUpperCase()}
+								<span className={`badge px-3 rounded-pill ${m.status?.toLowerCase() === 'active' ? 'badge-active' : 'badge-pending'}`}>
+									{m.status?.toUpperCase()}
 								</span>
 							</td>
 							<td className="text-end pe-4">

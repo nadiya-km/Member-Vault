@@ -96,7 +96,7 @@ const MemberDetails = () => {
 						<div className="oxford-card-header d-flex justify-content-between align-items-center">
 							<h5 className="mb-0 text-success fw-bold">Active Membership</h5>
 							{membership && (
-								<span className="card-type-badge">
+								<span className={`badge px-3 rounded-pill ${membership.status?.toLowerCase() === 'active' ? 'badge-active' : 'badge-pending'}`}>
 									{membership.status.replace('_', ' ').toUpperCase()}
 								</span>
 							)}

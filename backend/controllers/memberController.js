@@ -56,11 +56,18 @@ exports.getMemberDetails = async (req, res) => {
 
 	res.json({ data: { member, membership, profileLink } });
 };
+const Invoice = require('../model/Invoice');
+const Payment = require('../model/Payment');
+
 exports.getProfileBySecretKey = async (req, res) => {
 	const member = await Member.findOne({
 		secretKey: req.params.secretKey,
 		status: 'active',
 	});
+
+	if (!member) {
+		return res.status(404).json({ message: 'Profile not found' });
+	}
 
 	const membership = await Membership.findOne({
 		memberId: member._id,
@@ -69,7 +76,25 @@ exports.getProfileBySecretKey = async (req, res) => {
 		.populate('planId')
 		.populate('personalTrainer');
 
-	res.json({ success: true, data: { member, membership } });
+	const invoices = await Invoice.find({ memberId: member._id }).sort({ createdAt: -1 });
+
+	// Self-healing: Update PENDING invoices if a successful payment exists
+	const updatedInvoices = await Promise.all(invoices.map(async (inv) => {
+		if (inv.status === 'PENDING') {
+			const successPayment = await Payment.findOne({
+				invoiceId: inv._id,
+				status: 'SUCCESS'
+			});
+
+			if (successPayment) {
+				inv.status = 'PAID';
+				await Invoice.findByIdAndUpdate(inv._id, { status: 'PAID' });
+			}
+		}
+		return inv;
+	}));
+
+	res.json({ success: true, data: { member, membership, invoices: updatedInvoices } });
 };
 
 exports.regenerateProfileLink = async (req, res) => {

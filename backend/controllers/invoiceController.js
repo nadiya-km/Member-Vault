@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Invoice = require("../model/Invoice");
 const Member = require("../model/Member");
+const Payment = require("../model/Payment");
 
 exports.getInvoiceById = async (req, res) => {
   try {
@@ -23,5 +24,34 @@ exports.getInvoiceById = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Invoice fetch failed" });
+  }
+};
+
+exports.getAllInvoices = async (req, res) => {
+  try {
+    const invoices = await Invoice.find()
+      .populate('memberId', 'name email phone')
+      .sort({ createdAt: -1 });
+
+    // Self-healing: Update PENDING invoices if a successful payment exists
+    const updatedInvoices = await Promise.all(invoices.map(async (inv) => {
+      if (inv.status === 'PENDING') {
+        const successPayment = await Payment.findOne({
+          invoiceId: inv._id,
+          status: 'SUCCESS'
+        });
+
+        if (successPayment) {
+          inv.status = 'PAID';
+          await Invoice.findByIdAndUpdate(inv._id, { status: 'PAID' });
+        }
+      }
+      return inv;
+    }));
+
+    res.json({ success: true, data: updatedInvoices });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch invoices" });
   }
 };

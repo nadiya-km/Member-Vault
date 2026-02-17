@@ -1,145 +1,62 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../../services/api';
+import MemberForm from '../../../components/member/memberForm';
 
 const EditMember = () => {
 	const { id } = useParams();
 	const navigate = useNavigate();
-
-	const [form, setForm] = useState({
-		name: '',
-		email: '',
-		phone: '',
-		whatsappNumber: '',
-		age: '',
-		status: 'active',
-	});
-
+	const [member, setMember] = useState(null);
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
 		const fetchMember = async () => {
-			const res = await api.get(`/members/${id}`);
-			const m = res.data.data.member;
-
-			setForm({
-				name: m.name,
-				email: m.email,
-				phone: m.phone,
-				whatsappNumber: m.whatsappNumber,
-				age: m.age || '',
-				status: m.status,
-			});
-
-			setLoading(false);
+			try {
+				const res = await api.get(`/members/${id}`, {
+					headers: {
+						Authorization: `Bearer ${localStorage.getItem('token')}`,
+					},
+				});
+				setMember(res.data.data.member);
+			} catch (err) {
+				console.error('Failed to fetch member', err);
+				alert('Member not found');
+				navigate('/admin/members');
+			} finally {
+				setLoading(false);
+			}
 		};
 
 		fetchMember();
-	}, [id]);
+	}, [id, navigate]);
 
-	const handleChange = (e) => {
-		setForm({ ...form, [e.target.name]: e.target.value });
-	};
-
-	const handleSubmit = async (e) => {
-		e.preventDefault();
-
-		try {
-			await api.put(`/members/${id}`, form);
-			alert('Member updated successfully');
-			navigate(`/admin/members/${id}`);
-		} catch {
-			alert('Failed to update member');
-		}
-	};
-
-	if (loading) return <p className="p-4">Loading...</p>;
+	if (loading) {
+		return (
+			<div className="d-flex justify-content-center align-items-center py-5">
+				<div className="spinner-border text-primary" role="status">
+					<span className="visually-hidden">Loading...</span>
+				</div>
+			</div>
+		);
+	}
 
 	return (
-		<div className="p-4">
-			<h3 className="mb-4">Edit Member</h3>
+		<div className="container-fluid p-0">
+			<div className="mb-4">
+				<h2 className="oxford-title fw-bold underline">Management Console</h2>
+				<p className="text-muted">Update profile information for {member?.name}</p>
+			</div>
 
-			<form onSubmit={handleSubmit} className="card p-4 shadow-sm">
-				<div className="mb-3">
-					<label>Name</label>
-					<input
-						className="form-control"
-						name="name"
-						value={form.name}
-						onChange={handleChange}
-						required
+			<div className="row justify-content-center">
+				<div className="col-lg-8">
+					<MemberForm
+						mode="edit"
+						initialData={member}
+						closeForm={() => navigate(`/admin/members/${id}`)}
+						refreshMembers={() => { }} // Not strictly needed here as we navigate away
 					/>
 				</div>
-
-				<div className="mb-3">
-					<label>Email</label>
-					<input
-						type="email"
-						className="form-control"
-						name="email"
-						value={form.email}
-						onChange={handleChange}
-						required
-					/>
-				</div>
-
-				<div className="mb-3">
-					<label>Phone</label>
-					<input
-						className="form-control"
-						name="phone"
-						value={form.phone}
-						onChange={handleChange}
-						required
-					/>
-				</div>
-
-				<div className="mb-3">
-					<label>WhatsApp</label>
-					<input
-						className="form-control"
-						name="whatsappNumber"
-						value={form.whatsappNumber}
-						onChange={handleChange}
-						required
-					/>
-				</div>
-
-				<div className="mb-3">
-					<label>Age</label>
-					<input
-						type="number"
-						className="form-control"
-						name="age"
-						value={form.age}
-						onChange={handleChange}
-					/>
-				</div>
-
-				<div className="mb-3">
-					<label>Status</label>
-					<select
-						className="form-select"
-						name="status"
-						value={form.status}
-						onChange={handleChange}
-					>
-						<option value="active">Active</option>
-						<option value="inactive">Inactive</option>
-					</select>
-				</div>
-
-				<div className="d-flex gap-2">
-					<button className="btn btn-primary">Save Changes</button>
-					<button
-						type="button"
-						className="btn btn-secondary"
-						onClick={() => navigate(-1)}
-					>
-						Cancel
-					</button>
-				</div>
-			</form>
+			</div>
 		</div>
 	);
 };

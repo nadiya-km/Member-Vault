@@ -25,19 +25,32 @@ const MembershipPlans = () => {
 	}, []);
 
 	return (
-	<>
-			<div className="p-4">
-				<div className="d-flex justify-content-between align-items-center mb-3">
-					<h4>Membership Plans</h4>
-					<button
-						className="btn btn-dark"
-						onClick={() => setShowForm(!showForm)}
-					>
-						{showForm ? 'Back to Plans' : '+ Add Plan'}
-					</button>
+		<div className="container-fluid p-0">
+			<div className="d-flex justify-content-between align-items-center mb-4">
+				<div>
+					<h2 className="oxford-title fw-bold underline">Membership Plans</h2>
+					<p className="text-muted mb-0">Manage your facility access tiers</p>
 				</div>
+				<button
+					className="btn-oxford-primary px-4"
+					onClick={() => setShowForm(!showForm)}
+				>
+					{showForm ? (
+						<>
+							<i className="bi bi-arrow-left me-2"></i>
+							Back to Plans
+						</>
+					) : (
+						<>
+							<i className="bi bi-plus-lg me-2"></i>
+							Create New Plan
+						</>
+					)}
+				</button>
+			</div>
 
-				<div className="card p-3">
+			<div className="oxford-card">
+				<div className="oxford-card-body">
 					{showForm ? (
 						<PlanForm
 							onSuccess={() => {
@@ -46,13 +59,23 @@ const MembershipPlans = () => {
 							}}
 						/>
 					) : loading ? (
-						<p>Loading...</p>
+						<div className="text-center py-5">
+							<div className="spinner-border text-primary" />
+							<p className="mt-2 mb-0">Fetching plans...</p>
+						</div>
+					) : plans.length === 0 ? (
+						<div className="text-center py-5">
+							<i className="bi bi-folder2-open display-4 text-muted"></i>
+							<p className="text-muted mt-2">No plans defined yet</p>
+						</div>
 					) : (
-						<PlanTable plans={plans} onRefresh={fetchPlans} />
+						<div className="p-1">
+							<PlanTable plans={plans} onRefresh={fetchPlans} />
+						</div>
 					)}
 				</div>
 			</div>
-		</>
+		</div>
 	);
 };
 

@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react';
 import api from '../../services/api';
 
-const MemberForm = ({ closeForm, refreshMembers }) => {
+const MemberForm = ({ closeForm, refreshMembers, mode = 'add', initialData = null }) => {
 	const [trainers, setTrainers] = useState([]);
 
 	const [formData, setFormData] = useState({
-		name: '',
-		email: '',
-		phone: '',
-		whatsappNumber: '',
-		age: '',
-		personalTrainer: '', // 👈 optional
+		name: initialData?.name || '',
+		email: initialData?.email || '',
+		phone: initialData?.phone || '',
+		whatsappNumber: initialData?.whatsappNumber || '',
+		age: initialData?.age || '',
+		personalTrainer: initialData?.personalTrainer?._id || initialData?.personalTrainer || '',
 	});
 
 	useEffect(() => {
@@ -38,92 +38,118 @@ const MemberForm = ({ closeForm, refreshMembers }) => {
 		e.preventDefault();
 
 		try {
-			await api.post(
-				'/members',
-				{
-					...formData,
-					personalTrainer: formData.personalTrainer || null, // ✅ important
-				},
-				{
-					headers: {
-						Authorization: `Bearer ${localStorage.getItem('token')}`,
-					},
-				}
-			);
+			const payload = {
+				...formData,
+				personalTrainer: formData.personalTrainer || null,
+			};
+
+			if (mode === 'edit' && initialData?._id) {
+				await api.put(`/members/${initialData._id}`, payload, {
+					headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+				});
+			} else {
+				await api.post('/members', payload, {
+					headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+				});
+			}
 
 			refreshMembers();
 			closeForm();
 		} catch (err) {
-			alert(err.response?.data?.message || 'Error creating member');
+			alert(err.response?.data?.message || `Error ${mode === 'edit' ? 'updating' : 'creating'} member`);
 		}
 	};
 
 	return (
-		<div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center">
-			<form onSubmit={handleSubmit} className="bg-white p-6 rounded w-96">
-				<h3 className="text-lg font-semibold mb-4">Add Member</h3>
+		<div className={mode === 'edit' ? "" : "fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50"}>
+			<form onSubmit={handleSubmit} className={`oxford-card p-4 rounded shadow-2xl ${mode === 'edit' ? 'w-full' : 'w-96'}`}>
+				<h3 className="oxford-title mb-4 with-underline">
+					{mode === 'edit' ? 'Refine Member Details' : 'New Member Entry'}
+				</h3>
 
-				<input
-					type="text"
-					name="name"
-					placeholder="Name"
-					className="border p-2 w-full mb-2"
-					onChange={handleChange}
-					required
-				/>
+				<div className="mb-3">
+					<label className="oxford-label">Full Name</label>
+					<input
+						type="text"
+						name="name"
+						className="form-control"
+						value={formData.name}
+						onChange={handleChange}
+						required
+					/>
+				</div>
 
-				<input
-					type="email"
-					name="email"
-					placeholder="Email"
-					className="border p-2 w-full mb-2"
-					onChange={handleChange}
-					required
-				/>
+				<div className="row mb-3">
+					<div className="col-md-6">
+						<label className="oxford-label">Email</label>
+						<input
+							type="email"
+							name="email"
+							className="form-control"
+							value={formData.email}
+							onChange={handleChange}
+							required
+						/>
+					</div>
+					<div className="col-md-6">
+						<label className="oxford-label">Age</label>
+						<input
+							type="number"
+							name="age"
+							className="form-control"
+							value={formData.age}
+							onChange={handleChange}
+							required
+						/>
+					</div>
+				</div>
 
-				<input
-					type="text"
-					name="phone"
-					placeholder="Phone"
-					className="border p-2 w-full mb-2"
-					onChange={handleChange}
-					required
-				/>
+				<div className="row mb-3">
+					<div className="col-md-6">
+						<label className="oxford-label">Phone</label>
+						<input
+							type="text"
+							name="phone"
+							className="form-control"
+							value={formData.phone}
+							onChange={handleChange}
+							required
+						/>
+					</div>
+					<div className="col-md-6">
+						<label className="oxford-label">WhatsApp</label>
+						<input
+							type="text"
+							name="whatsappNumber"
+							className="form-control"
+							value={formData.whatsappNumber}
+							onChange={handleChange}
+						/>
+					</div>
+				</div>
 
-				<input
-					type="text"
-					name="whatsappNumber"
-					placeholder="WhatsApp Number"
-					className="border p-2 w-full mb-2"
-					onChange={handleChange}
-					required
-				/>
+				<div className="mb-4">
+					<label className="oxford-label">Personal Trainer (Optional)</label>
+					<select
+						name="personalTrainer"
+						className="form-select"
+						onChange={handleChange}
+					>
+						<option value="">None</option>
+						{trainers.map((t) => (
+							<option key={t._id} value={t._id}>
+								{t.name}
+							</option>
+						))}
+					</select>
+				</div>
 
-				<input
-					type="number"
-					name="age"
-					placeholder="Age"
-					className="border p-2 w-full mb-2"
-					onChange={handleChange}
-				/>
-
-				{/* ✅ Personal Trainer (Optional) */}
-				<select name="personalTrainer" className="border p-2 w-full mb-4" onChange={handleChange}>
-					<option value="">No Personal Trainer</option>
-					{trainers.map((t) => (
-						<option key={t._id} value={t._id}>
-							{t.name}
-						</option>
-					))}
-				</select>
-
-				<div className="flex justify-between">
-					<button type="button" className="bg-gray-400 px-4 py-2 rounded" onClick={closeForm}>
+				<div className="d-flex justify-content-between gap-3 mt-4">
+					<button type="button" className="btn-oxford-secondary w-full" onClick={closeForm}>
 						Cancel
 					</button>
-
-					<button type="submit" className="bg-green-500 text-white px-4 py-2 rounded">
-						Save
+					<button type="submit" className="btn-oxford-primary w-full">
+						Save Member
 					</button>
 				</div>
 			</form>

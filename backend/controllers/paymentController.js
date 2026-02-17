@@ -3,6 +3,7 @@ const Payment = require('../model/Payment');
 const crypto = require('crypto');
 const axios = require("axios");
 const Membership = require('../model/Membership');
+const Invoice = require('../model/Invoice');
 
 
 // paymentController.js (TOP of file)
@@ -27,7 +28,7 @@ const normalizePaymentMethod = (rawMethod = "") => {
       return "CASH";
 
     default:
-      return "UPI"; 
+      return "UPI";
   }
 };
 
@@ -55,25 +56,27 @@ exports.savePayment = async (req, res) => {
   try {
     const { invoiceId, amount, method, memberId } = req.body;
 
-   const payment = await Payment.create({
-  invoiceId,
-  memberId,
-  paymentType: 'CASH',   // ✅ ADD THIS
-  gateway: 'OFFLINE',
-  method: 'CASH',
-  amount,
-  status: 'SUCCESS',
-  transactionId: 'CASH-' + Date.now(),
-  paidAt: new Date()
-});
+    const payment = await Payment.create({
+      invoiceId,
+      memberId,
+      paymentType: 'CASH',   // ✅ ADD THIS
+      gateway: 'OFFLINE',
+      method: 'CASH',
+      amount,
+      status: 'SUCCESS',
+      transactionId: 'CASH-' + Date.now(),
+      paidAt: new Date()
+    });
     await Membership.findOneAndUpdate(
-  { invoiceId },
-  {
-    status: 'active',
-    paidAt: new Date(),
-    amountPaid: amount,
-  }
-);
+      { invoiceId },
+      {
+        status: 'active',
+        paidAt: new Date(),
+        amountPaid: amount,
+      }
+    );
+
+    await Invoice.findByIdAndUpdate(invoiceId, { status: 'PAID' });
 
     res.json({ success: true, payment });
   } catch (err) {
@@ -110,18 +113,18 @@ exports.verifyAndSavePayment = async (req, res) => {
     }
 
     // Save payment
-   const payment = await Payment.create({
-  invoiceId,
-  memberId,
-  paymentType: 'ONLINE', // ✅ ADD THIS
-  gateway: "RAZORPAY",
-  method,
-  amount,
-  status: "SUCCESS",
-  transactionId: razorpay_payment_id,
-  orderId: razorpay_order_id,
-  paidAt: new Date(),
-});
+    const payment = await Payment.create({
+      invoiceId,
+      memberId,
+      paymentType: 'ONLINE', // ✅ ADD THIS
+      gateway: "RAZORPAY",
+      method,
+      amount,
+      status: "SUCCESS",
+      transactionId: razorpay_payment_id,
+      orderId: razorpay_order_id,
+      paidAt: new Date(),
+    });
     // 🔥 ACTIVATE MEMBERSHIP
     await Membership.findOneAndUpdate(
       { invoiceId },
@@ -131,6 +134,8 @@ exports.verifyAndSavePayment = async (req, res) => {
         amountPaid: amount,
       }
     );
+
+    await Invoice.findByIdAndUpdate(invoiceId, { status: 'PAID' });
 
     return res.json({
       success: true,
@@ -183,7 +188,7 @@ exports.createCashfreeOrder = async (req, res) => {
       orderId,
     });
   } catch (err) {
-   
+
     res.status(500).json({
       success: false,
       message: err.response?.data?.message || "Cashfree order failed",
@@ -209,30 +214,32 @@ exports.verifyCashfreePayment = async (req, res) => {
       return res.status(400).json({ success: false, message: "Payment not completed" });
     }
 
-   const cfRawMethod =
-  verify.data.payments?.[0]?.payment_method ||
-  verify.data.payments?.[0]?.payment_method_type ||
-  "";
+    const cfRawMethod =
+      verify.data.payments?.[0]?.payment_method ||
+      verify.data.payments?.[0]?.payment_method_type ||
+      "";
 
-const normalizedMethod = normalizePaymentMethod(cfRawMethod);
+    const normalizedMethod = normalizePaymentMethod(cfRawMethod);
 
-const payment = await Payment.create({
-  invoiceId,
-  memberId,
-  paymentType: "ONLINE",
-  gateway: "CASHFREE",
-  method: normalizedMethod, // ✅ ENUM SAFE
-  amount,
-  status: "SUCCESS",
-  transactionId:
-    verify.data.payments?.[0]?.cf_payment_id || orderId,
-  paidAt: new Date(),
-});
+    const payment = await Payment.create({
+      invoiceId,
+      memberId,
+      paymentType: "ONLINE",
+      gateway: "CASHFREE",
+      method: normalizedMethod, // ✅ ENUM SAFE
+      amount,
+      status: "SUCCESS",
+      transactionId:
+        verify.data.payments?.[0]?.cf_payment_id || orderId,
+      paidAt: new Date(),
+    });
 
     await Membership.findOneAndUpdate(
       { invoiceId },
       { status: "active", paidAt: new Date(), amountPaid: amount }
     );
+
+    await Invoice.findByIdAndUpdate(invoiceId, { status: "PAID" });
 
     res.json({ success: true, payment });
   } catch (err) {

@@ -44,7 +44,7 @@ const Member = () => {
 			{/* HEADER */}
 			<div className="d-flex justify-content-between align-items-center mb-4">
 				<div>
-					<h2 className="oxford-title fw-bold underline">Members Directory</h2>
+					<h2 className="oxford-title fw-bold underline">Member Directory</h2>
 					<p className="text-muted mb-0">
 						Total Active: <span className="fw-bold text-dark">{members.length}</span>
 					</p>
@@ -77,21 +77,28 @@ const Member = () => {
 				</div>
 			)}
 
-			{/* SEARCH BAR */}
-			<div className="oxford-card mb-4">
-				<div className="oxford-card-body p-3">
-					<div className="input-group">
-						<span className="input-group-text bg-transparent border-0 pe-0">
-							<i className="bi bi-search text-muted"></i>
-						</span>
-						<input
-							type="text"
-							className="form-control border-0 bg-transparent shadow-none"
-							placeholder="Search by name or phone..."
-							value={search}
-							onChange={(e) => setSearch(e.target.value)}
-							style={{ height: '40px' }}
-						/>
+			{/* SEARCH BAR & DIRECTORY HEADER */}
+			<div className="oxford-card mb-4 border-0 shadow-sm">
+				<div className="oxford-card-body p-3 d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+					<div className="mb-3 mb-md-0">
+						<h5 className="mb-0 fw-bold text-midnight">
+							<i className="bi bi-person-lines-fill me-2"></i>Member Records
+						</h5>
+					</div>
+					<div className="search-wrapper" style={{ minWidth: '300px' }}>
+						<div className="input-group bg-light rounded-pill px-3 py-1">
+							<span className="input-group-text bg-transparent border-0 pe-2">
+								<i className="bi bi-search text-muted"></i>
+							</span>
+							<input
+								type="text"
+								className="form-control border-0 bg-transparent shadow-none"
+								placeholder="Search members..."
+								value={search}
+								onChange={(e) => setSearch(e.target.value)}
+								style={{ fontSize: '0.9rem' }}
+							/>
+						</div>
 					</div>
 				</div>
 			</div>

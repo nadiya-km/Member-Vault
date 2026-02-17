@@ -1,14 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
-import $ from 'jquery';
-
-import 'datatables.net';
-import 'datatables.net-responsive';
-
+import { useState } from 'react';
 import { deletePlan, updatePlan } from '../../services/planService';
 
 const PlanTable = ({ plans = [], onRefresh }) => {
-	const tableRef = useRef(null);
-
 	const [selectedPlan, setSelectedPlan] = useState(null);
 	const [editMode, setEditMode] = useState(false);
 	const [form, setForm] = useState({
@@ -19,23 +12,6 @@ const PlanTable = ({ plans = [], onRefresh }) => {
 		description: '',
 	});
 
-	/* ================= DATATABLE INIT ================= */
-	useEffect(() => {
-		if (!plans.length) return;
-
-		const table = $(tableRef.current).DataTable({
-			destroy: true,
-			responsive: false,
-			scrollX: true,     
-			autoWidth: false,
-			pageLength: 10,
-			columnDefs: [{ orderable: false, targets: 5 }],
-		});
-
-		return () => table.destroy();
-	}, [plans]);
-
-	
 	const handleView = (plan) => {
 		setSelectedPlan(plan);
 		setEditMode(false);
@@ -76,48 +52,52 @@ const PlanTable = ({ plans = [], onRefresh }) => {
 		onRefresh();
 	};
 
-	
 	return (
 		<>
 			<div className="table-responsive">
-				<table
-					ref={tableRef}
-					className="display nowrap table table-bordered table-hover align-middle w-100"
-				>
-					<thead className="table-light">
+				<table className="table table-hover align-middle mb-0">
+					<thead className="bg-light">
 						<tr>
-							<th>Name</th>
+							<th className="ps-4">Name</th>
 							<th>Duration</th>
 							<th>Price</th>
 							<th>Features</th>
 							<th>Description</th>
-							<th className="text-center">Actions</th>
+							<th className="text-end pe-4">Actions</th>
 						</tr>
 					</thead>
 
 					<tbody>
 						{plans.length === 0 ? (
 							<tr>
-								<td colSpan="6" className="text-center">
+								<td colSpan="6" className="text-center py-4 text-muted">
 									No plans found
 								</td>
 							</tr>
 						) : (
 							plans.map((plan) => (
 								<tr key={plan._id}>
-									<td className="fw-semibold">{plan.name}</td>
-									<td>{plan.durationInMonths} Months</td>
-									<td>₹{plan.price}</td>
-									<td>{plan.features || '-'}</td>
-									<td>{plan.description || '-'}</td>
-									<td className="text-center">
+									<td className="ps-4 fw-bold text-dark">{plan.name}</td>
+									<td>
+										<span className="badge bg-primary-subtle text-primary px-3 rounded-pill">
+											{plan.durationInMonths} Months
+										</span>
+									</td>
+									<td className="fw-bold">₹{plan.price}</td>
+									<td className="text-muted small" style={{ maxWidth: '200px' }}>
+										<div className="text-truncate">{plan.features || '-'}</div>
+									</td>
+									<td className="text-muted small" style={{ maxWidth: '200px' }}>
+										<div className="text-truncate">{plan.description || '-'}</div>
+									</td>
+									<td className="text-end pe-4">
 										<button
-											className="btn btn-sm btn-outline-primary"
+											className="btn btn-sm btn-oxford-primary px-3"
 											data-bs-toggle="modal"
 											data-bs-target="#planModal"
 											onClick={() => handleView(plan)}
 										>
-											View
+											<i className="bi bi-eye me-1"></i> View
 										</button>
 									</td>
 								</tr>
@@ -127,7 +107,7 @@ const PlanTable = ({ plans = [], onRefresh }) => {
 				</table>
 			</div>
 
-		
+
 			<div className="modal fade" id="planModal" tabIndex="-1">
 				<div className="modal-dialog modal-dialog-centered modal-md">
 					<div className="modal-content">

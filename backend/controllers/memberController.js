@@ -1,6 +1,7 @@
 // controllers/memberController.js
 const Member = require('../model/Member');
 const Membership = require('../model/Membership');
+const PersonalTrainer = require('../model/PersonalTrainer');
 const { sendEmail } = require('../utils/sendEmail');
 
 exports.createMember = async (req, res) => {
@@ -120,11 +121,30 @@ exports.getDashboard = async (req, res) => {
 			status: 'active',
 		});
 
+		const activePlans = await Membership.countDocuments({
+			status: 'active',
+		});
+
+		const totalTrainers = await PersonalTrainer.countDocuments({
+			status: 'active',
+		});
+
+		const revenueData = await Invoice.aggregate([
+			{ $match: { status: 'PAID' } },
+			{ $group: { _id: null, total: { $sum: '$amount' } } }
+		]);
+
+		const totalRevenue = revenueData.length > 0 ? revenueData[0].total : 0;
+
 		res.json({
 			admin: req.admin,
 			totalMembers,
+			activePlans,
+			totalTrainers,
+			totalRevenue,
 		});
 	} catch (error) {
+		console.error('Dashboard error:', error);
 		res.status(500).json({ message: 'Dashboard error' });
 	}
 };

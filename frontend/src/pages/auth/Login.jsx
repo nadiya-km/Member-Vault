@@ -71,9 +71,7 @@ const Login = () => {
 							) : 'Sign In to Dashboard'}
 						</button>
 
-						<div className="mt-4 text-center">
-							<small className="text-muted">© 2026 Datatribe Member-Vault-2</small>
-						</div>
+						
 					</div>
 				</div>
 			</div>

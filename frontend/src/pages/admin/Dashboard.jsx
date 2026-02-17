@@ -21,84 +21,42 @@ const Dashboard = () => {
   }, []);
 
   return (
-<>
-      {/* CSS INSIDE SAME FILE */}
-      <style>{`
-        .dashboard {
-          padding: 20px;
-        }
-
-        .welcome-text {
-          font-size: 1.6rem;
-          font-weight: 700;
-          margin-bottom: 24px;
-          color: #111827;
-        }
-
-        .welcome-text span {
-          color: #2563eb;
-        }
-
-        .stats-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-          gap: 20px;
-        }
-
-        .stat-card {
-          display: flex;
-          align-items: center;
-          padding: 20px;
-          border-radius: 16px;
-          color: #fff;
-          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
-          transition: transform 0.25s ease;
-        }
-
-        .stat-card:hover {
-          transform: translateY(-4px);
-        }
-
-        .stat-card.blue {
-          background: linear-gradient(135deg, #2563eb, #1e40af);
-        }
-
-        .stat-icon {
-          font-size: 2.6rem;
-          margin-right: 16px;
-        }
-
-        .stat-info h3 {
-          font-size: 0.95rem;
-          margin-bottom: 6px;
-          opacity: 0.9;
-        }
-
-        .stat-info p {
-          font-size: 1.9rem;
-          font-weight: 800;
-        }
-		  
-      `}</style>
-
-     <div className="dashboard">
-  <h1 className="welcome-text">
-    Admin Dashboard, 
-  </h1>
-
-  <div className="stats-row">
-    <div className="stat-card blue full">
-      <div className="stat-icon">
-        <i className="bi bi-people-fill"></i>
+    <div className="container-fluid p-0">
+      <div className="mb-4">
+        <h2 className="oxford-title fw-bold underline">Admin Dashboard</h2>
+        <p className="text-muted">Welcome back, {admin?.name || 'Administrator'}</p>
       </div>
-      <div className="stat-info">
-        <h3>Total Members</h3>
-        <p>{totalMembers}</p>
+
+      <div className="row g-4">
+        <div className="col-md-4">
+          <div className="oxford-card h-100" style={{ borderLeft: '4px solid var(--midnight)' }}>
+            <div className="oxford-card-body d-flex align-items-center">
+              <div className="rounded-circle p-3 me-3" style={{ background: 'linear-gradient(135deg, var(--midnight), var(--ocean))' }}>
+                <i className="bi bi-people-fill text-white fs-3"></i>
+              </div>
+              <div>
+                <h6 className="oxford-label mb-1">Total Members</h6>
+                <p className="h3 mb-0 fw-bold text-dark">{totalMembers}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="col-md-4">
+          <div className="oxford-card h-100" style={{ borderLeft: '4px solid var(--ocean)' }}>
+            <div className="oxford-card-body d-flex align-items-center">
+              <div className="rounded-circle p-3 me-3" style={{ background: 'rgba(91, 136, 178, 0.2)' }}>
+                <i className="bi bi-cash-stack text-primary fs-3"></i>
+              </div>
+              <div>
+                <h6 className="oxford-label mb-1">Active Plans</h6>
+                <p className="h3 mb-0 fw-bold text-dark">-</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</div>
-  </>
   );
 };
 

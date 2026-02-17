@@ -19,10 +19,11 @@ const MemberTable = ({ members }) => {
 						<td>{m.email}</td>
 						<td>
 							<button
-								className="btn btn-primary btn-sm"
+								className="btn-oxford-primary btn-sm"
 								onClick={() => navigate(`/admin/members/${m._id}`)}
+								style={{ height: '36px', padding: '0 15px', fontSize: '0.85rem' }}
 							>
-								Manage
+								<i className="bi bi-gear-fill me-1"></i> Manage
 							</button>
 						</td>
 					</tr>

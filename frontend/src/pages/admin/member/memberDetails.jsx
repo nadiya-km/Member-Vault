@@ -37,208 +37,188 @@ const MemberDetails = () => {
 		fetchMembership();
 	}, [id]);
 
-	if (!member) return <p className="p-4">Loading member...</p>;
+	if (!member) return (
+		<div className="oxford-page-wrapper d-flex align-items-center justify-content-center">
+			<div className="spinner-border text-primary" />
+		</div>
+	);
 
 	return (
-		<div className="p-4">
-			<h2 className="mb-4">Member Details</h2>
-
-			{/* MEMBER INFO */}
-			<div className="card mb-4">
-				<div className="card-header">
-					<h5 className="mb-0">Member Info</h5>
+		<div className="container-fluid p-0">
+			<div className="d-flex justify-content-between align-items-center mb-4">
+				<div>
+					<h2 className="oxford-title fw-bold underline">Member Profile</h2>
+					<p className="text-muted mb-0">Comprehensive view of member records</p>
 				</div>
-				<div className="card-body row g-3">
-					<div className="col-md-4">
-						<strong>Name:</strong> {member.name}
-					</div>
-					<div className="col-md-4">
-						<strong>Email:</strong> {member.email}
-					</div>
-					<div className="col-md-4">
-						<strong>Phone:</strong> {member.phone}
-					</div>
-					<div className="col-md-4">
-						<strong>WhatsApp:</strong> {member.whatsappNumber}
-					</div>
-					<div className="col-md-4">
-						<strong>Age:</strong> {member.age}
-					</div>
-				</div>
+				<button className="btn-oxford-secondary" onClick={() => navigate(-1)}>
+					<i className="bi bi-arrow-left me-2"></i>
+					Back to List
+				</button>
 			</div>
 
-			{/* CURRENT MEMBERSHIP */}
-			<div className="card mb-4">
-				<div className="card-header bg-success text-white d-flex justify-content-between align-items-center">
-					<h5 className="mb-0">Current Membership</h5>
-					{membership && (
-						<span
-							className={`badge ${
-								membership.status === 'active'
-									? 'bg-light text-success'
-									: membership.status === 'pending_payment'
-										? 'bg-warning text-dark'
-										: 'bg-secondary'
-							}`}
-						>
-							{membership.status.replace('_', ' ').toUpperCase()}
-						</span>
-					)}
+			<div className="row g-4">
+				{/* MEMBER INFO */}
+				<div className="col-lg-12">
+					<div className="oxford-card">
+						<div className="oxford-card-header">
+							<h5 className="mb-0 text-primary fw-bold">Personal Details</h5>
+						</div>
+						<div className="oxford-card-body">
+							<div className="quota-list">
+								<div className="detail-row px-2">
+									<span className="detail-label">Full Name</span>
+									<span className="detail-value text-dark fw-semibold">{member.name}</span>
+								</div>
+								<div className="detail-row px-2">
+									<span className="detail-label">Email Address</span>
+									<span className="detail-value">{member.email}</span>
+								</div>
+								<div className="detail-row px-2">
+									<span className="detail-label">Primary Phone</span>
+									<span className="detail-value">{member.phone}</span>
+								</div>
+								<div className="detail-row px-2">
+									<span className="detail-label">WhatsApp Number</span>
+									<span className="detail-value">{member.whatsappNumber}</span>
+								</div>
+								<div className="detail-row px-2">
+									<span className="detail-label">Age</span>
+									<span className="detail-value">{member.age} years</span>
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
 
-				<div className="card-body">
-					{loadingMembership ? (
-						<p>Loading membership...</p>
-					) : !membership ? (
-						/* NO MEMBERSHIP AT ALL */
-						<div className="text-center">
-							<p className="text-muted">No membership found</p>
-							<button
-								className="btn btn-primary"
-								onClick={() => navigate(`/admin/members/${id}/add-membership`)}
-							>
-								Add Membership
-							</button>
-						</div>
-					) : membership.status === 'cancelled' || membership.status === 'expired' ? (
-						/* CANCELLED / EXPIRED */
-						<div className="text-center">
-							<p className="fw-semibold text-danger">
-								Last membership was {membership.status.toUpperCase()}
-							</p>
-
-							{membership.status === 'cancelled' && (
-								<p className="text-secondary mb-3">
-									<strong>Cancelled On:</strong> {new Date(membership.updatedAt).toDateString()}
-								</p>
-							)}
-
-							<button
-								className="btn btn-primary"
-								onClick={() => navigate(`/admin/members/${id}/add-membership`)}
-							>
-								Add New Membership
-							</button>
-						</div>
-					) : (
-						/* ACTIVE / PENDING / SCHEDULED */
-						<div className="row g-3">
-							<div className="col-md-4">
-								<strong>Plan:</strong> {membership.planId.name}
-							</div>
-
-							<div className="col-md-4">
-								<strong>Price:</strong> ₹{membership.planId.price}
-							</div>
-
-							<div className="col-md-4">
-								<strong>Duration:</strong> {membership.planId.durationInMonths} months
-							</div>
-
-							<div className="col-md-4">
-								<strong>Start:</strong> {new Date(membership.startDate).toDateString()}
-							</div>
-
-							<div className="col-md-4">
-								<strong>End:</strong> {new Date(membership.endDate).toDateString()}
-							</div>
-
-							<div className="col-md-4">
-								<strong>Status:</strong>{' '}
-								<span
-									className={`badge ${
-										membership.status === 'active'
-											? 'bg-success'
-											: membership.status === 'pending_payment'
-												? 'bg-warning text-dark'
-												: 'bg-info'
-									}`}
-								>
+				{/* CURRENT MEMBERSHIP */}
+				<div className="col-lg-12">
+					<div className="oxford-card">
+						<div className="oxford-card-header d-flex justify-content-between align-items-center">
+							<h5 className="mb-0 text-success fw-bold">Active Membership</h5>
+							{membership && (
+								<span className="card-type-badge">
 									{membership.status.replace('_', ' ').toUpperCase()}
 								</span>
-							</div>
+							)}
+						</div>
 
-							{membership.personalTrainer && (
-								<div className="col-md-4">
-									<strong>Trainer:</strong> {membership.personalTrainer.name}
+						<div className="oxford-card-body">
+							{loadingMembership ? (
+								<div className="text-center py-4">
+									<div className="spinner-border text-success" />
+								</div>
+							) : !membership ? (
+								<div className="text-center py-4">
+									<p className="text-muted">No active membership found</p>
+									<button
+										className="btn-oxford-primary"
+										onClick={() => navigate(`/admin/members/${id}/add-membership`)}
+									>
+										Initialize Membership
+									</button>
+								</div>
+							) : (
+								<div className="quota-list">
+									<div className="detail-row px-2">
+										<span className="detail-label">Selected Plan</span>
+										<span className="detail-value fw-bold text-primary">{membership.planId.name}</span>
+									</div>
+									<div className="detail-row px-2">
+										<span className="detail-label">Billing Amount</span>
+										<span className="detail-value fw-bold">₹{membership.planId.price}</span>
+									</div>
+									<div className="detail-row px-2">
+										<span className="detail-label">Active Period</span>
+										<span className="detail-value">
+											{new Date(membership.startDate).toLocaleDateString()} - {new Date(membership.endDate).toLocaleDateString()}
+										</span>
+									</div>
+									{membership.personalTrainer && (
+										<div className="detail-row px-2">
+											<span className="detail-label">Assigned Trainer</span>
+											<span className="detail-value">{membership.personalTrainer.name}</span>
+										</div>
+									)}
 								</div>
 							)}
 						</div>
-					)}
-				</div>
-			</div>
-
-			{/* PROFILE LINK */}
-			<div className="card mb-4">
-				<div className="card-header">
-					<strong>Member Profile Link</strong>
-				</div>
-				<div className="card-body">
-					<input className="form-control mb-2" value={profileLink || ''} readOnly />
-					<div className="d-flex gap-2">
-						<button
-							className="btn btn-outline-primary"
-							disabled={!profileLink}
-							onClick={() => navigator.clipboard.writeText(profileLink)}
-						>
-							Copy
-						</button>
-						<button
-							className="btn btn-outline-danger"
-							onClick={async () => {
-								if (!window.confirm('Regenerate profile link?')) return;
-								const res = await api.post(`/members/${id}/regenerate-link`);
-								setProfileLink(res.data.profileLink);
-							}}
-						>
-							Regenerate
-						</button>
 					</div>
 				</div>
-			</div>
 
-			{/* ACTION BUTTONS */}
-			<div className="row g-2">
-				<div className="col-md-3 col-12">
-					<button
-						className="btn btn-secondary w-100"
-						onClick={() =>
-							navigate(
-								membership
-									? `/admin/members/${id}/edit-membership`
-									: `/admin/members/${id}/add-membership`
-							)
-						}
-					>
-						{membership ? 'Edit Membership' : 'Add Membership'}
-					</button>
+				{/* PROFILE LINK */}
+				<div className="col-lg-12">
+					<div className="oxford-card">
+						<div className="oxford-card-header">
+							<h5 className="mb-0 fw-bold">Profile Access Control</h5>
+						</div>
+						<div className="oxford-card-body">
+							<div className="input-group mb-3">
+								<input
+									className="form-control bg-light"
+									value={profileLink || ''}
+									readOnly
+									style={{ borderStyle: 'dashed' }}
+								/>
+								<button
+									className="btn btn-outline-primary"
+									disabled={!profileLink}
+									onClick={() => {
+										navigator.clipboard.writeText(profileLink);
+										alert('Copied!');
+									}}
+								>
+									<i className="bi bi-clipboard me-1"></i> Copy
+								</button>
+							</div>
+							<div className="d-flex justify-content-end">
+								<button
+									className="btn-danger-oxford px-4"
+									onClick={async () => {
+										if (!window.confirm('Securely regenerate this link?')) return;
+										const res = await api.post(`/members/${id}/regenerate-link`);
+										setProfileLink(res.data.profileLink);
+									}}
+								>
+									<i className="bi bi-shield-refresh me-2"></i>
+									Regenerate Secure Link
+								</button>
+							</div>
+						</div>
+					</div>
 				</div>
 
-				<div className="col-md-3 col-12">
-					<button
-						className="btn btn-primary w-100"
-						onClick={() => navigate(`/admin/members/${id}/add-membership`)}
-					>
-						Add Next Membership
-					</button>
-				</div>
-
-				<div className="col-md-3 col-12">
-					<button
-						className="btn btn-dark w-100"
-						onClick={() => navigate(`/admin/members/${id}/membership-history`)}
-					>
-						Membership History
-					</button>
-				</div>
-
-				<div className="col-md-3 col-12">
-					<button
-						className="btn btn-warning w-100"
-						onClick={() => navigate(`/admin/members/${id}/edit`)}
-					>
-						Edit Member
-					</button>
+				{/* ACTION BUTTONS */}
+				<div className="col-lg-12 mb-5">
+					<div className="d-flex flex-wrap gap-3">
+						<button
+							className="btn-oxford-secondary flex-grow-1"
+							onClick={() => navigate(membership ? `/admin/members/${id}/edit-membership` : `/admin/members/${id}/add-membership`)}
+						>
+							<i className="bi bi-pencil-square me-2"></i>
+							{membership ? 'Modify Membership' : 'Add Membership'}
+						</button>
+						<button
+							className="btn-oxford-primary flex-grow-1"
+							onClick={() => navigate(`/admin/members/${id}/add-membership`)}
+						>
+							<i className="bi bi-arrow-repeat me-2"></i>
+							Renew/Add Next
+						</button>
+						<button
+							className="btn-oxford-secondary flex-grow-1"
+							onClick={() => navigate(`/admin/members/${id}/membership-history`)}
+						>
+							<i className="bi bi-clock-history me-2"></i>
+							Full History
+						</button>
+						<button
+							className="btn-oxford-primary flex-grow-1"
+							onClick={() => navigate(`/admin/members/${id}/edit`)}
+						>
+							<i className="bi bi-person-gear me-2"></i>
+							Edit Member
+						</button>
+					</div>
 				</div>
 			</div>
 		</div>

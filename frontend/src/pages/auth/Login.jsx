@@ -27,35 +27,53 @@ const Login = () => {
 	};
 
 	return (
-		<div className="container-fluid min-vh-100 d-flex align-items-center justify-content-center bg-light">
+		<div className="oxford-page-wrapper d-flex align-items-center justify-content-center" style={{ background: 'linear-gradient(135deg, var(--midnight) 0%, #1a3a63 50%, #234977 100%)' }}>
 			<div className="col-11 col-sm-8 col-md-5 col-lg-4">
-				<div className="card shadow-lg border-0 rounded-4">
-					<div className="card-body p-4 p-md-5">
-						<h3 className="text-center fw-bold mb-4">Admin Login</h3>
+				<div className="oxford-card shadow-2xl border-0">
+					<div className="oxford-card-body p-4 p-md-5">
+						<div className="text-center mb-4">
+							<div className="mb-3 d-inline-block p-3 rounded-circle" style={{ background: 'linear-gradient(135deg, var(--midnight), var(--ocean))' }}>
+								<i className="bi bi-shield-lock-fill text-white fs-1"></i>
+							</div>
+							<h3 className="oxford-title fw-bold">Admin Portal</h3>
+							<p className="text-muted small">Enter your credentials to manage MemberVault</p>
+						</div>
 
 						<div className="mb-3">
-							<label className="form-label">Email</label>
+							<label className="oxford-label">Email Address</label>
 							<input
 								type="email"
-								className="form-control "
-								placeholder=" "
+								className="form-control"
 								onChange={(e) => setEmail(e.target.value)}
 							/>
 						</div>
 
 						<div className="mb-4">
-							<label className="form-label">Password</label>
+							<label className="oxford-label">Password</label>
 							<input
 								type="password"
-								className="form-control "
-								placeholder=" "
+								className="form-control"
 								onChange={(e) => setPassword(e.target.value)}
 							/>
 						</div>
 
-						<button className="btn btn-primary btn-lg w-100" onClick={login} disabled={loading}>
-							{loading ? 'Logging in...' : 'Login'}
+						<button
+							className="btn-oxford-primary w-100 py-3"
+							onClick={login}
+							disabled={loading}
+							style={{ fontSize: '1.1rem' }}
+						>
+							{loading ? (
+								<>
+									<span className="spinner-border spinner-border-sm me-2" />
+									Authenticating...
+								</>
+							) : 'Sign In to Dashboard'}
 						</button>
+
+						<div className="mt-4 text-center">
+							<small className="text-muted">© 2026 Datatribe Member-Vault-2</small>
+						</div>
 					</div>
 				</div>
 			</div>

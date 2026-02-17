@@ -12,6 +12,7 @@ import AddMembership from '../pages/admin/member/addMembership';
 import EditMembership from '../pages/admin/member/editMembership';
 import Payment from '../pages/admin/payment';
 import PaymentPage from '../pages/admin/PaymentPage';
+import EditMember from '../pages/admin/member/EditMember';
 import MemberProfile from '../pages/member/profile';
 import MembershipHistory from '../pages/admin/member/membershipHistory';
 
@@ -38,6 +39,7 @@ const AppRoutes = () => {
 				<Route path="plans" element={<MembershipPlans />} />
 				<Route path="members" element={<Member />} />
 				<Route path="members/:id" element={<MemberDetails />} />
+				<Route path="members/:id/edit" element={<EditMember />} />
 				<Route path="members/:id/add-membership" element={<AddMembership />} />
 				<Route path="members/:id/edit-membership" element={<EditMembership />} />
 				<Route path="trainers" element={<Trainers />} />

@@ -159,11 +159,18 @@ const MemberProfile = () => {
 								{membership ? (
 									<div className="text-center">
 										<div className="mb-4">
-											<span className={`card-type-badge fs-6 ${membership.status === 'active' ? 'bg-success' : 'bg-warning'
-												}`}>
+											<span
+												className={`badge rounded-pill fs-6 px-4 py-2 ${membership.status === 'active'
+														? 'bg-success'
+														: membership.status === 'pending_payment'
+															? 'bg-warning text-dark'
+															: 'bg-secondary'
+													}`}
+											>
 												{membership.status.replace('_', ' ').toUpperCase()}
 											</span>
 										</div>
+
 
 										<h3 className="fw-bold text-dark mb-1">{membership.planId?.name}</h3>
 										<p className="text-muted mb-4">Valid till {new Date(membership.endDate).toDateString()}</p>

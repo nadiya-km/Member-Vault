@@ -16,7 +16,7 @@ const TrainerTable = ({ trainers, onRefresh }) => {
 		pricePerMonth: '',
 	});
 
-	/* ================= DATATABLE INIT ================= */
+
 	useEffect(() => {
 	if (!trainers.length) return;
 
@@ -34,7 +34,7 @@ const TrainerTable = ({ trainers, onRefresh }) => {
 	return () => table.destroy();
 }, [trainers]);
 
-	/* ================= HANDLERS ================= */
+
 	const handleView = (trainer) => {
 		setSelectedTrainer(trainer);
 		setEditMode(false);
@@ -66,7 +66,7 @@ const TrainerTable = ({ trainers, onRefresh }) => {
 		onRefresh();
 	};
 
-	/* ================= UI ================= */
+
 	return (
 		<>
 			<div className="table-responsive">
@@ -75,7 +75,7 @@ const TrainerTable = ({ trainers, onRefresh }) => {
 					className="display nowrap table table-bordered align-middle"
 					style={{ width: '100%' }}
 				>
-					<thead className="table-dark">
+					<thead className="table-light">
 						<tr>
 							<th>Name</th>
 							<th>Specialization</th>

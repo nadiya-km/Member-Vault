@@ -1,5 +1,5 @@
 :root {
-   
+
     --midnight: #122c4f;
     --crystal: #ffffff;
     --bg-light: #f8fafc;
@@ -193,15 +193,16 @@ body {
 }
 
 /* Badges */
-.card-type-badge {
-    background: linear-gradient(135deg, var(--midnight), var(--ocean));
-    color: var(--pearl-perfect) !important;
-    font-weight: 600;
-    font-size: 0.85rem;
-    padding: 6px 16px;
-    border-radius: 20px;
-    box-shadow: 0 4px 12px rgba(18, 44, 79, 0.2);
-    border: none;
+.badge-active {
+    background: linear-gradient(135deg, #10b981, #059669) !important;
+    color: white !important;
+    border: none !important;
+}
+
+.badge-pending {
+    background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+    color: white !important;
+    border: none !important;
 }
 
 /* Responsive Overrides */

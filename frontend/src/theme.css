@@ -1,5 +1,5 @@
 :root {
-    /* Crystal Midnight Palette - Clean Refinement */
+   
     --midnight: #122c4f;
     --crystal: #ffffff;
     --bg-light: #f8fafc;
@@ -8,6 +8,14 @@
     --dark-bg: rgba(18, 44, 79, 0.98);
     --dark-border: rgba(91, 136, 178, 0.25);
     --card-shadow: 0 8px 30px rgba(18, 44, 79, 0.05);
+}
+
+.bg-midnight {
+    background-color: var(--midnight) !important;
+}
+
+.text-midnight {
+    color: var(--midnight) !important;
 }
 
 * {

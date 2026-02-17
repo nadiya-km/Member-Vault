@@ -1,12 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
-import $ from 'jquery';
-import 'datatables.net';
-import 'datatables.net-responsive';
+import { useState } from 'react';
 import { deleteTrainer, updateTrainer } from '../../services/trainerService';
 
 const TrainerTable = ({ trainers, onRefresh }) => {
-	const tableRef = useRef(null);
-
 	const [selectedTrainer, setSelectedTrainer] = useState(null);
 	const [editMode, setEditMode] = useState(false);
 	const [form, setForm] = useState({
@@ -15,25 +10,6 @@ const TrainerTable = ({ trainers, onRefresh }) => {
 		experience: '',
 		pricePerMonth: '',
 	});
-
-
-	useEffect(() => {
-	if (!trainers.length) return;
-
-	const table = $(tableRef.current).DataTable({
-		destroy: true,
-		responsive: false,   
-		scrollX: true,       
-		autoWidth: false,
-		pageLength: 10,
-		columnDefs: [
-			{ orderable: false, targets: 4 },
-		],
-	});
-
-	return () => table.destroy();
-}, [trainers]);
-
 
 	const handleView = (trainer) => {
 		setSelectedTrainer(trainer);
@@ -66,40 +42,46 @@ const TrainerTable = ({ trainers, onRefresh }) => {
 		onRefresh();
 	};
 
-
 	return (
 		<>
 			<div className="table-responsive">
-				<table
-					ref={tableRef}
-					className="display nowrap table table-bordered align-middle"
-					style={{ width: '100%' }}
-				>
-					<thead className="table-light">
+				<table className="table table-hover align-middle mb-0">
+					<thead className="bg-light">
 						<tr>
-							<th>Name</th>
+							<th className="ps-4">Trainer Name</th>
 							<th>Specialization</th>
 							<th>Experience</th>
 							<th>Price / Month</th>
-							<th className="text-center">Actions</th>
+							<th className="text-end pe-4">Actions</th>
 						</tr>
 					</thead>
 
 					<tbody>
 						{trainers.map((trainer) => (
 							<tr key={trainer._id}>
-								<td>{trainer.name}</td>
-								<td>{trainer.specialization}</td>
+								<td className="ps-4">
+									<div className="d-flex align-items-center">
+										<div className="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center me-3" style={{ width: '40px', height: '40px' }}>
+											<i className="bi bi-person-fill"></i>
+										</div>
+										<span className="fw-bold text-dark">{trainer.name}</span>
+									</div>
+								</td>
+								<td>
+									<span className="badge bg-ocean-subtle text-ocean px-3 rounded-pill" style={{ backgroundColor: 'rgba(91, 136, 178, 0.15)', color: 'var(--ocean)' }}>
+										{trainer.specialization}
+									</span>
+								</td>
 								<td>{trainer.experience} yrs</td>
-								<td>₹{trainer.pricePerMonth}</td>
-								<td className="text-center">
+								<td className="fw-bold">₹{trainer.pricePerMonth}</td>
+								<td className="text-end pe-4">
 									<button
-										className="btn btn-sm btn-outline-primary"
+										className="btn btn-sm btn-oxford-primary px-3"
 										data-bs-toggle="modal"
 										data-bs-target="#trainerModal"
 										onClick={() => handleView(trainer)}
 									>
-										View
+										<i className="bi bi-eye me-1"></i> View
 									</button>
 								</td>
 							</tr>

@@ -25,8 +25,8 @@ const PlanTable = ({ plans = [], onRefresh }) => {
 
 		const table = $(tableRef.current).DataTable({
 			destroy: true,
-			responsive: false, // 🔥 prevent auto-hide
-			scrollX: true,     // 🔥 mobile scroll
+			responsive: false,
+			scrollX: true,     
 			autoWidth: false,
 			pageLength: 10,
 			columnDefs: [{ orderable: false, targets: 5 }],
@@ -35,7 +35,7 @@ const PlanTable = ({ plans = [], onRefresh }) => {
 		return () => table.destroy();
 	}, [plans]);
 
-	/* ================= HANDLERS ================= */
+	
 	const handleView = (plan) => {
 		setSelectedPlan(plan);
 		setEditMode(false);
@@ -76,7 +76,7 @@ const PlanTable = ({ plans = [], onRefresh }) => {
 		onRefresh();
 	};
 
-	/* ================= UI ================= */
+	
 	return (
 		<>
 			<div className="table-responsive">
@@ -84,7 +84,7 @@ const PlanTable = ({ plans = [], onRefresh }) => {
 					ref={tableRef}
 					className="display nowrap table table-bordered table-hover align-middle w-100"
 				>
-					<thead className="table-dark">
+					<thead className="table-light">
 						<tr>
 							<th>Name</th>
 							<th>Duration</th>
@@ -127,7 +127,7 @@ const PlanTable = ({ plans = [], onRefresh }) => {
 				</table>
 			</div>
 
-			{/* ================= MODAL ================= */}
+		
 			<div className="modal fade" id="planModal" tabIndex="-1">
 				<div className="modal-dialog modal-dialog-centered modal-md">
 					<div className="modal-content">
